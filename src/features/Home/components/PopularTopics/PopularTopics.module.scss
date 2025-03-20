@@ -1,0 +1,42 @@
+.popularTopics {
+	padding: 16px;
+}
+
+.topicList {
+	display: flex;
+	overflow-x: auto; 
+	gap: 12px; 
+	padding-bottom: 8px;
+}
+
+.topicCard {
+	flex: 0 0 auto; 
+	width: 140px; 
+	height: 156px; 
+	text-align: center;
+	padding: 12px;
+	border: 1px solid #ddd;
+	border-radius: 12px;
+	background-color: #fff;
+	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.icon {
+	width: 80px; 
+	height: 80px;
+	margin: 0 auto 0px auto; 
+	object-fit: cover; 
+}
+
+.topicTitle {
+	font-size: 14px;
+	font-weight: bold;
+	color: #333;
+	margin: 0;
+	line-height: 1.2;
+	display: -webkit-box;
+	-webkit-line-clamp: 3; 
+	-webkit-box-orient: vertical;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}

@@ -1,0 +1,44 @@
+.profileWrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 16px;
+  min-height: 100vh;
+  background-color: #f5f5f5;
+}
+
+.profileCard {
+  width: 100%;
+  max-width: 400px;
+  margin-bottom: 16px;
+  padding: 16px;
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.avatar {
+  width: 100px !important;
+  height: 100px !important;
+  margin: 0 auto 16px;
+  font-size: 32px;
+  background-color: #91d8df;
+  color: #fff;
+}
+
+.userName {
+  text-align: center;
+  font-weight: bold;
+}
+
+.userRole {
+  text-align: center;
+  color: #666;
+  margin-top: 8px;
+}
+
+.editButton {
+  margin-top: 16px;
+  width: 100%;
+  max-width: 400px;
+}

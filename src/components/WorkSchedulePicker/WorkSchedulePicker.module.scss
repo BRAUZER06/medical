@@ -1,0 +1,47 @@
+// WorkSchedulePicker.module.scss
+.rbc-calendar {
+  max-width: 600px;
+  margin: 0 auto;
+  font-family: 'Arial', sans-serif;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  padding: 16px;
+}
+
+.rbc-header {
+  background-color: #1976d2;
+  color: white;
+  padding: 10px;
+  border-radius: 4px;
+  text-align: center;
+}
+
+.rbc-today {
+  background-color: #e3f2fd;
+}
+
+.rbc-event {
+  background-color: #1976d2;
+  color: white;
+  border-radius: 4px;
+  padding: 2px 5px;
+}
+
+.rbc-selected {
+  background-color: #ffeb3b;
+  color: #000;
+}
+
+.rbc-toolbar button {
+  color: #1976d2;
+  border: 1px solid #1976d2;
+  border-radius: 4px;
+  padding: 5px 10px;
+  margin: 0 5px;
+}
+
+.rbc-toolbar button:hover {
+  background-color: #1976d2;
+  color: white;
+}

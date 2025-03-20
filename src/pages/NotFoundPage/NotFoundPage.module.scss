@@ -1,0 +1,40 @@
+.pageWrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: #f4f4f4;
+  padding: 16px;
+}
+
+.errorContent {
+  text-align: center;
+  background-color: #fff;
+  padding: 40px;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  max-width: 400px;
+  width: 100%;
+}
+
+.title {
+  font-size: 72px;
+  font-weight: bold;
+  margin-bottom: 16px;
+  color: #f44336; 
+}
+
+.message {
+  font-size: 18px;
+  color: #666;
+  margin-bottom: 24px;
+}
+
+.backButton {
+  margin-top: 16px;
+  background-color: #5e9cdb;
+  color: #fff;
+  &:hover {
+    background-color: #4682b4;
+  }
+}
