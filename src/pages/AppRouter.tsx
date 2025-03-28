@@ -17,14 +17,16 @@ const AppRouter = () => (
 		<div style={{ marginBottom: '56px' }}>
 			<Routes>
 				{/* Открытые маршруты */}
-				<Route path='/register' element={<RegisterUser />} />
-				<Route path='/login' element={<LoginUser />} />
-				<Route path='/' element={<HomePages />} />
+				<Route path="/register" element={<RegisterUser />} />
+				<Route path="/login" element={<LoginUser />} />
+				<Route path="/" element={<HomePages />} />
 
+				<Route path="/doctors" element={<DoctorsList />} />
+				<Route path="/doctors/:id" element={<DoctorDetails />} />
 				{/* Защищённые маршруты (видны только после авторизации) */}
 				<Route element={<ProtectedRoute />}>
-					<Route path='/about' element={<About />} />
-					<Route path='/profile' element={<UserProfile />} />
+					<Route path="/about" element={<About />} />
+					<Route path="/profile" element={<UserProfile />} />
 					{/* Новый маршрут для записи к врачу */}
 
 					{/* <Route
@@ -32,12 +34,12 @@ const AppRouter = () => (
 						element={<PatientAppointmentScheduler />}
 					/> */}
 
-					<Route path='/doctors' element={<DoctorsList />} />
-					<Route path='/doctors/:id' element={<DoctorDetails />} />
+					{/* <Route path="/doctors" element={<DoctorsList />} /> */}
+					{/* <Route path='/doctors/:id' element={<DoctorDetails />} /> */}
 				</Route>
 
 				{/* Страница 404 */}
-				<Route path='*' element={<NotFoundPage />} />
+				<Route path="*" element={<NotFoundPage />} />
 			</Routes>
 		</div>
 		<BottomNav />

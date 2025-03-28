@@ -1,6 +1,8 @@
 import React, { useState } from 'react'
-import { Box, Typography, Paper, Button } from '@mui/material'
-import styles from './PatientHistory.module.scss'
+import { Box, Typography, Paper, Button, Divider } from '@mui/material'
+import EventIcon from '@mui/icons-material/Event'
+import NotesIcon from '@mui/icons-material/Notes'
+import LocalHospitalIcon from '@mui/icons-material/LocalHospital'
 
 interface Visit {
 	doctorName: string
@@ -16,51 +18,75 @@ interface PatientHistoryProps {
 const PatientHistory: React.FC<PatientHistoryProps> = ({ visits }) => {
 	const [showAll, setShowAll] = useState(false)
 
-	const handleToggleShowAll = () => {
-		setShowAll(prevState => !prevState) 
-	}
+	const handleToggleShowAll = () => setShowAll(prev => !prev)
 
-	const displayedVisits = showAll ? visits : visits.slice(0, 3) 
+	const displayedVisits = showAll ? visits : visits.slice(0, 3)
 
 	return (
-		<Paper className={styles.historyWrapper}>
-			<Typography variant='h6' className={styles.historyTitle}>
-				История посещений
+		<Paper
+			elevation={1}
+			sx={{
+				p: 2,
+				borderRadius: 2,
+				backgroundColor: '#fefefe',
+				mt: 2,
+			}}
+		>
+			<Typography variant="h6" gutterBottom>
+				🧾 История посещений
 			</Typography>
+
 			{displayedVisits.length > 0 ? (
-				displayedVisits.map((visit, index) => (
-					<Box key={index} className={styles.visitCard}>
-						<Box className={styles.visitHeader}>
-							<Typography variant='h6' className={styles.doctorName}>
-								{visit.doctorName}
-							</Typography>
-							<Typography variant='body2' className={styles.specialty}>
-								{visit.specialty}
-							</Typography>
+				<Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+					{displayedVisits.map((visit, index) => (
+						<Box
+							key={index}
+							sx={{
+								p: 2,
+								borderRadius: 2,
+								backgroundColor: '#f5f5f5',
+								display: 'flex',
+								flexDirection: 'column',
+								gap: 1,
+							}}
+						>
+							<Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+								<Typography fontWeight={600}>{visit.doctorName}</Typography>
+								<Typography variant="body2" color="text.secondary">
+									{visit.specialty}
+								</Typography>
+							</Box>
+
+							<Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+								<EventIcon fontSize="small" color="action" />
+								<Typography variant="body2">{visit.date}</Typography>
+							</Box>
+
+							<Box sx={{ display: 'flex', alignItems: 'start', gap: 1 }}>
+								<NotesIcon fontSize="small" color="action" />
+								<Typography variant="body2">{visit.notes}</Typography>
+							</Box>
 						</Box>
-						<Typography variant='body2' className={styles.visitDate}>
-							{visit.date}
-						</Typography>
-						<Typography variant='body2' className={styles.visitNotes}>
-							{visit.notes}
-						</Typography>
-					</Box>
-				))
+					))}
+				</Box>
 			) : (
-				<Typography variant='body2' color='textSecondary'>
+				<Typography variant="body2" color="text.secondary">
 					Нет посещений
 				</Typography>
 			)}
-			{/* Кнопка "Показать еще" или "Скрыть" в зависимости от состояния */}
+
 			{visits.length > 3 && (
-				<Button
-					variant='outlined'
-					color='info'
-					onClick={handleToggleShowAll}
-					fullWidth
-				>
-					{showAll ? 'Скрыть' : 'Показать еще'}
-				</Button>
+				<>
+					<Divider sx={{ my: 2 }} />
+					<Button
+						variant="outlined"
+						color="primary"
+						fullWidth
+						onClick={handleToggleShowAll}
+					>
+						{showAll ? 'Скрыть' : 'Показать ещё'}
+					</Button>
+				</>
 			)}
 		</Paper>
 	)

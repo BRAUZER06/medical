@@ -70,9 +70,11 @@ export const TimeSlotAccordion = ({
 	times,
 	selectedTimes,
 	handleTimeClick,
-	availableSlots,
 	formatToLocalTime,
 }) => {
+
+
+
 	return (
 		<Accordion
 			defaultExpanded
@@ -88,12 +90,14 @@ export const TimeSlotAccordion = ({
 			<AccordionDetails>
 				<Grid container spacing={1}>
 					{times.map(timeSlot => {
-						const isBooked = availableSlots.some(
+
+						const isBooked = selectedTimes.some(
 							slot =>
 								formatToLocalTime(slot.start) === timeSlot.start &&
 								formatToLocalTime(slot.end) === timeSlot.end &&
 								slot.booked
 						)
+						
 
 						const isSelected = selectedTimes.some(
 							slot =>

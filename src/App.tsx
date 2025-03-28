@@ -8,7 +8,8 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 const theme = createTheme({
 	palette: {
 		primary: {
-			main: '#5dd7e8',
+			// main: '#5dd7e8',
+			main: '#01c9e5',
 			dark: '#84E1EC',
 		},
 	},

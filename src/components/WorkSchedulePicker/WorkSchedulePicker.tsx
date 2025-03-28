@@ -10,11 +10,9 @@ import timezone from 'dayjs/plugin/timezone'
 import utc from 'dayjs/plugin/utc'
 import { getMyAvailabilities, setAvailabilities } from '../../api/calendar'
 
-// Подключаем плагины dayjs
 dayjs.extend(utc)
 dayjs.extend(timezone)
 
-// Функция для генерации временных слотов
 const generateTimeSlots = (startTime, endTime, step) => {
 	const slots = []
 	const start = dayjs()
@@ -32,14 +30,12 @@ const generateTimeSlots = (startTime, endTime, step) => {
 	for (let i = 0; i < iterations; i++) {
 		const slotStart = start.clone().add(i * step, 'minute')
 		const slotEnd = slotStart.clone().add(step, 'minute')
-
 		slots.push({
 			start: slotStart.format('HH:mm'),
 			end: slotEnd.format('HH:mm'),
 		})
 	}
 
-	// Проверка на остаток времени (чтобы захватить последний слот если он прям встык)
 	const lastSlotStart = start.clone().add(iterations * step, 'minute')
 	if (lastSlotStart.isBefore(end)) {
 		slots.push({
@@ -47,7 +43,6 @@ const generateTimeSlots = (startTime, endTime, step) => {
 			end: end.format('HH:mm'),
 		})
 	}
-
 	return slots
 }
 
@@ -58,36 +53,28 @@ const eveningTimes = generateTimeSlots('18:00', '23:59', 30)
 const CustomCalendar = () => {
 	const [selectedTimes, setSelectedTimes] = useState([])
 	const [selectedDate, setSelectedDate] = useState(dayjs())
-	const [availableSlots, setAvailableSlots] = useState([])
-	const [isLoading, setIsLoading] = useState(false)
 
-console.log('selectedTimes', selectedTimes)
+	console.log('selectedTimes', selectedTimes)
 
-
-
-	// Загрузка доступных слотов при монтировании компонента
 	useEffect(() => {
 		const fetchSlots = async () => {
-			setIsLoading(true)
 			try {
 				const response = await getMyAvailabilities()
-
-				console.log('response', response)
-
-				// Фильтруем слоты по выбранной дате
 				const slotsForSelectedDate = response?.filter(slot =>
 					dayjs(slot.start).isSame(selectedDate, 'day')
 				)
 
-				setAvailableSlots(slotsForSelectedDate)
-				setSelectedTimes(slotsForSelectedDate) // Заполняем выбранные слоты
+				const normalizedSlots = response.map(slot => ({
+					start: dayjs.utc(slot.start).format('YYYY-MM-DDTHH:mm:ss[Z]'),
+					end: dayjs.utc(slot.end).format('YYYY-MM-DDTHH:mm:ss[Z]'),
+					booked: slot.booked,
+				}))
+
+				setSelectedTimes(normalizedSlots)
 			} catch (error) {
 				console.error('Ошибка при загрузке доступных слотов:', error)
-			} finally {
-				setIsLoading(false)
 			}
 		}
-
 		fetchSlots()
 	}, [selectedDate])
 
@@ -100,20 +87,17 @@ console.log('selectedTimes', selectedTimes)
 		const userTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
 		const dateKey = selectedDate.format('YYYY-MM-DD')
 
-		// Преобразуем локальное время в международный формат (UTC)
 		const internationalSlot = {
 			start: dayjs
 				.tz(`${dateKey}T${timeSlot.start}:00`, userTimeZone)
 				.utc()
-				.format(),
+				.format('YYYY-MM-DDTHH:mm:ss[Z]'),
 			end: dayjs
 				.tz(`${dateKey}T${timeSlot.end}:00`, userTimeZone)
 				.utc()
-				.format(),
-			booked: timeSlot.booked || false,
+				.format('YYYY-MM-DDTHH:mm:ss[Z]'),
 		}
 
-		// Проверяем, есть ли уже такой слот в выбранных
 		const isSlotSelected = selectedTimes.some(
 			slot =>
 				slot.start === internationalSlot.start &&
@@ -126,52 +110,55 @@ console.log('selectedTimes', selectedTimes)
 					slot =>
 						!(
 							slot.start === internationalSlot.start &&
-							slot.end === internationalSlot.end &&
-							!slot.booked
+							slot.end === internationalSlot.end
 						)
 				)
 			)
 		} else {
-			setSelectedTimes(prev => [...prev, internationalSlot])
+			setSelectedTimes(prev => {
+				const newTimes = [...prev, internationalSlot]
+				const unique = Array.from(
+					new Map(newTimes.map(item => [item.start + item.end, item])).values()
+				)
+				return unique
+			})
 		}
 	}
-const handleSave = async () => {
-	const dataToSend = { slots: selectedTimes }
 
-	try {
-		await setAvailabilities(dataToSend)
-		alert('Данные успешно сохранены!')
+	const handleSave = async () => {
+		const dataToSend = { slots: selectedTimes }
 
-		// После успешного сохранения обновляем данные
-		const response = await getMyAvailabilities()
-		const slotsForSelectedDate = response?.filter(slot =>
-			dayjs(slot.start).isSame(selectedDate, 'day')
-		)
+		try {
+			await setAvailabilities(dataToSend)
 
-		setAvailableSlots(slotsForSelectedDate)
-		setSelectedTimes(slotsForSelectedDate)
-	} catch (error) {
-		console.error('Ошибка:', error)
-		alert('Произошла ошибка при сохранении данных.')
+			const response = await getMyAvailabilities()
+			const slotsForSelectedDate = response?.filter(slot =>
+				dayjs(slot.start).isSame(selectedDate, 'day')
+			)
+			const normalizedSlots = slotsForSelectedDate.map(slot => ({
+				start: dayjs.utc(slot.start).format('YYYY-MM-DDTHH:mm:ss[Z]'),
+				end: dayjs.utc(slot.end).format('YYYY-MM-DDTHH:mm:ss[Z]'),
+				booked: slot.booked,
+			}))
+			setSelectedTimes(normalizedSlots)
+		} catch (error) {}
 	}
-}
 
-	
-const formatToLocalTime = internationalTime => {
-	return dayjs.utc(internationalTime).local().format('HH:mm')
-}
+	const formatToLocalTime = internationalTime => {
+		return dayjs.utc(internationalTime).local().format('HH:mm')
+	}
 
 	return (
 		<Box sx={{ padding: 2, maxWidth: 600, margin: 'auto' }}>
 			{/* Переключатель шага времени */}
 			<FormControlLabel
-				control={<Switch color='primary' />}
-				label='30 минут'
+				control={<Switch color="primary" />}
+				label="30 минут"
 				sx={{ marginBottom: 2 }}
 			/>
 
 			{/* Календарь */}
-			<LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale='ru'>
+			<LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="ru">
 				<DateCalendar
 					value={selectedDate}
 					onChange={handleDateChange}
@@ -227,34 +214,31 @@ const formatToLocalTime = internationalTime => {
 			{/* Временные слоты */}
 			<Box sx={{ marginTop: 4 }}>
 				<TimeSlotAccordion
-					title='Утро'
+					title="Утро"
 					times={morningTimes}
 					selectedTimes={selectedTimes}
 					handleTimeClick={handleTimeClick}
-					availableSlots={availableSlots}
 					formatToLocalTime={formatToLocalTime}
 				/>
 				<TimeSlotAccordion
-					title='День'
+					title="День"
 					times={dayTimes}
 					selectedTimes={selectedTimes}
 					handleTimeClick={handleTimeClick}
-					availableSlots={availableSlots}
 					formatToLocalTime={formatToLocalTime}
 				/>
 				<TimeSlotAccordion
-					title='Вечер'
+					title="Вечер"
 					times={eveningTimes}
 					selectedTimes={selectedTimes}
 					handleTimeClick={handleTimeClick}
-					availableSlots={availableSlots}
 					formatToLocalTime={formatToLocalTime}
 				/>
 			</Box>
 
 			{/* Кнопка "Сохранить" */}
 			<Button
-				variant='contained'
+				variant="contained"
 				onClick={handleSave}
 				sx={{
 					backgroundColor: '#4caf50',

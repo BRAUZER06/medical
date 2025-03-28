@@ -1,16 +1,26 @@
 
 import React, { useState } from 'react'
 import {
+	Box,
+	Paper,
+	Typography,
 	TextField,
-	Checkbox,
-	FormControlLabel,
 	Button,
 	Alert,
-	RadioGroup,
+	FormControlLabel,
+	Checkbox,
 	FormControl,
 	FormLabel,
+	RadioGroup,
 	Radio,
+	InputAdornment,
+	Fade,
 } from '@mui/material'
+import PersonIcon from '@mui/icons-material/Person'
+import EmailIcon from '@mui/icons-material/Email'
+import LockIcon from '@mui/icons-material/Lock'
+import HowToRegIcon from '@mui/icons-material/HowToReg'
+
 import * as yup from 'yup'
 import styles from './RegisterUser.module.scss'
 import { useNavigate } from 'react-router-dom'
@@ -152,136 +162,225 @@ export default function RegisterUser() {
 	}
 
 	return (
-		<div className={styles.loginFormWrapper}>
-			<div className={styles.loginForm}>
-				<h2>Регистрация</h2>
+		<Box
+			sx={{
+				minHeight: '100vh',
+				display: 'flex',
+				justifyContent: 'center',
+				alignItems: 'center',
+				px: 2,
+				background: 'linear-gradient(135deg, #f8f8f8 0%, #e0eafc 100%)',
+			}}
+		>
+			<Fade in timeout={500}>
+				<Paper
+					elevation={4}
+					sx={{
+						width: '100%',
+						maxWidth: 420,
+						p: 2,
+						borderRadius: 4,
+						backgroundColor: 'white',
+						boxShadow: '0px 10px 25px rgba(0,0,0,0.05)',
+					}}
+				>
+					<Box sx={{ textAlign: 'center', mb: 3 }}>
+						<HowToRegIcon sx={{ fontSize: 40, color: 'primary.main', mb: 1 }} />
+						<Typography variant="h5" fontWeight="bold">
+							Регистрация
+						</Typography>
+						<Typography variant="body2" color="text.secondary">
+							Заполните форму ниже
+						</Typography>
+					</Box>
 
-				<form onSubmit={handleSubmit} className={styles.formContainer}>
-					<TextField
-						label='Имя'
-						variant='outlined'
-						fullWidth
-						name='first_name'
-						value={formData.first_name}
-						onChange={handleInputChange}
-						error={!!errors.first_name}
-						helperText={errors.first_name}
-					/>
-
-					<TextField
-						label='Фамилия'
-						variant='outlined'
-						fullWidth
-						name='last_name'
-						value={formData.last_name}
-						onChange={handleInputChange}
-						error={!!errors.last_name}
-						helperText={errors.last_name}
-					/>
-
-					{hasMiddleName && (
-						<TextField
-							label='Отчество'
-							variant='outlined'
-							fullWidth
-							name='middle_name'
-							value={formData.middle_name}
-							onChange={handleInputChange}
-						/>
-					)}
-
-					<FormControlLabel
-						control={
-							<Checkbox
-								checked={hasMiddleName}
-								onChange={handleCheckboxChange}
-								color='primary'
+					<form onSubmit={handleSubmit} noValidate>
+						<Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+							<TextField
+								label="Имя"
+								name="first_name"
+								value={formData.first_name}
+								onChange={handleInputChange}
+								error={!!errors.first_name}
+								helperText={errors.first_name}
+								fullWidth
+								InputProps={{
+									startAdornment: (
+										<InputAdornment position="start">
+											<PersonIcon color="action" />
+										</InputAdornment>
+									),
+								}}
 							/>
-						}
-						label='Добавить отчество (при наличии)'
-					/>
 
-					<FormControl component='fieldset'>
-						<FormLabel component='legend'>Роль</FormLabel>
-						<RadioGroup
-							row
-							name='role'
-							value={formData.role.toString()}
-							onChange={handleRoleChange}
-						>
-							<FormControlLabel value='0' control={<Radio />} label='Пациент' />
-							<FormControlLabel value='1' control={<Radio />} label='Доктор' />
-						</RadioGroup>
-						{errors.role && (
-							<span style={{ color: 'red', fontSize: '12px' }}>
-								{errors.role}
-							</span>
-						)}
-					</FormControl>
+							<TextField
+								label="Фамилия"
+								name="last_name"
+								value={formData.last_name}
+								onChange={handleInputChange}
+								error={!!errors.last_name}
+								helperText={errors.last_name}
+								fullWidth
+								InputProps={{
+									startAdornment: (
+										<InputAdornment position="start">
+											<PersonIcon color="action" />
+										</InputAdornment>
+									),
+								}}
+							/>
 
-					<TextField
-						label='Email'
-						variant='outlined'
-						fullWidth
-						name='email'
-						value={formData.email}
-						onChange={handleInputChange}
-						error={!!errors.email}
-						helperText={errors.email}
-					/>
+							{hasMiddleName && (
+								<TextField
+									label="Отчество"
+									name="middle_name"
+									value={formData.middle_name}
+									onChange={handleInputChange}
+									fullWidth
+									InputProps={{
+										startAdornment: (
+											<InputAdornment position="start">
+												<PersonIcon color="action" />
+											</InputAdornment>
+										),
+									}}
+								/>
+							)}
 
-					<TextField
-						label='Пароль'
-						variant='outlined'
-						fullWidth
-						name='password'
-						type='password'
-						value={formData.password}
-						onChange={handleInputChange}
-						error={!!errors.password}
-						helperText={errors.password}
-					/>
+							<FormControlLabel
+								control={
+									<Checkbox
+										checked={hasMiddleName}
+										onChange={handleCheckboxChange}
+										color="primary"
+									/>
+								}
+								label="Добавить отчество (при наличии)"
+								sx={{ ml: '-8px' }}
+							/>
 
-					<TextField
-						label='Подтверждение пароля'
-						variant='outlined'
-						fullWidth
-						name='password_confirmation'
-						type='password'
-						value={formData.password_confirmation}
-						onChange={handleInputChange}
-						error={!!errors.password_confirmation}
-						helperText={errors.password_confirmation}
-					/>
+							<FormControl>
+								<FormLabel component="legend">Роль</FormLabel>
+								<RadioGroup
+									row
+									name="role"
+									value={formData.role.toString()}
+									onChange={handleRoleChange}
+								>
+									<FormControlLabel
+										value="0"
+										control={<Radio />}
+										label="Пациент"
+									/>
+									<FormControlLabel
+										value="1"
+										control={<Radio />}
+										label="Доктор"
+									/>
+								</RadioGroup>
+								{errors.role && (
+									<Typography variant="caption" color="error">
+										{errors.role}
+									</Typography>
+								)}
+							</FormControl>
 
-					<Button
-						type='submit'
-						variant='outlined'
-						color='error'
-						fullWidth
-						size='large'
-						disabled={registerMutation.isPending}
-					>
-						<strong>
-							{registerMutation.isPending
-								? 'Регистрация...'
-								: 'Зарегистрироваться'}
-						</strong>
-					</Button>
+							<TextField
+								label="Email"
+								name="email"
+								type="email"
+								value={formData.email}
+								onChange={handleInputChange}
+								error={!!errors.email}
+								helperText={errors.email}
+								fullWidth
+								InputProps={{
+									startAdornment: (
+										<InputAdornment position="start">
+											<EmailIcon color="action" />
+										</InputAdornment>
+									),
+								}}
+							/>
 
-					{successMessage && <Alert severity='success'>{successMessage}</Alert>}
-					{errorMessage && <Alert severity='error'>{errorMessage}</Alert>}
-					<Button
-						size='medium'
-						onClick={() => navigate('/login')}
-						variant='text'
-						fullWidth
-						color='info'
-					>
-						Уже есть аккаунт? <strong>&nbsp;Войти</strong>
-					</Button>
-				</form>
-			</div>
-		</div>
+							<TextField
+								label="Пароль"
+								name="password"
+								type="password"
+								value={formData.password}
+								onChange={handleInputChange}
+								error={!!errors.password}
+								helperText={errors.password}
+								fullWidth
+								InputProps={{
+									startAdornment: (
+										<InputAdornment position="start">
+											<LockIcon color="action" />
+										</InputAdornment>
+									),
+								}}
+							/>
+
+							<TextField
+								label="Подтверждение пароля"
+								name="password_confirmation"
+								type="password"
+								value={formData.password_confirmation}
+								onChange={handleInputChange}
+								error={!!errors.password_confirmation}
+								helperText={errors.password_confirmation}
+								fullWidth
+								InputProps={{
+									startAdornment: (
+										<InputAdornment position="start">
+											<LockIcon color="action" />
+										</InputAdornment>
+									),
+								}}
+							/>
+
+							{successMessage && (
+								<Alert severity="success">{successMessage}</Alert>
+							)}
+							{errorMessage && <Alert severity="error">{errorMessage}</Alert>}
+
+							<Button
+								type="submit"
+								variant="contained"
+								fullWidth
+								size="large"
+								disabled={registerMutation.isPending}
+								sx={{
+									fontWeight: 'bold',
+									textTransform: 'none',
+									py: 1.5,
+									mt: 1,
+								}}
+							>
+								{registerMutation.isPending
+									? 'Регистрация...'
+									: 'Зарегистрироваться'}
+							</Button>
+
+							<Button
+								variant="text"
+								fullWidth
+								color="info"
+								onClick={() => navigate('/login')}
+								sx={{
+									textTransform: 'none',
+									fontSize: 14,
+									color: 'text.secondary',
+									'& strong': { color: 'primary.main' },
+								}}
+							>
+								Уже есть аккаунт?{' '}
+								<strong style={{ color: '#4c4cff' }}>&nbsp;Войти</strong>
+							</Button>
+						</Box>
+					</form>
+				</Paper>
+			</Fade>
+		</Box>
 	)
 }

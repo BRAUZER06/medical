@@ -33,10 +33,14 @@ export const TimeSlotButton = ({
 	handleTimeClick,
 	isBooked,
 }) => {
+
+console.log('isBooked', isBooked)
+
+	
 	return (
 		<Button
 			variant={isSelected ? 'contained' : 'outlined'}
-			onClick={() => !isBooked && handleTimeClick(timeSlot)} // Клик работает только если слот не забронирован
+			onClick={() => !isBooked && handleTimeClick(timeSlot)} 
 			disabled={isBooked} // Заблокировать кнопку, если слот забронирован
 			sx={{
 				minWidth: '120px',

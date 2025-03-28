@@ -44,6 +44,22 @@ export const fetchAvailableSlots = async (
 	}
 }
 
+// Запись к врачу от пациента
+export const createAppointment = async (payload: {
+	appointment: {
+		doctor_id: number
+		availability_id: number
+		notes: string
+	}
+}): Promise<void> => {
+	try {
+		await axiosInstance.post('/appointments', payload)
+	} catch (error) {
+		console.error('Ошибка при записи на приём:', error)
+		throw error
+	}
+}
+
 // Отправка данных о доступных днях
 export const setAvailabilities = async (
 	data: AvailabilityRequest
@@ -52,6 +68,22 @@ export const setAvailabilities = async (
 		const response: AxiosResponse<void> = await axiosInstance.post(
 			'/availabilities',
 			data
+		)
+		console.log('Данные успешно отправлены:', response.data)
+	} catch (error) {
+		console.error('Ошибка при отправке данных:', error)
+		throw error
+	}
+}
+
+// Отправка данных о доступных днях
+export const deleteAvailabilities = async (data: any): Promise<void> => {
+	try {
+		console.log('айдишки которые я отправляю для удаления', data)
+
+		const response: AxiosResponse<void> = await axiosInstance.delete(
+			'/availabilities',
+			{ data }
 		)
 		console.log('Данные успешно отправлены:', response.data)
 	} catch (error) {

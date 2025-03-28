@@ -1,196 +1,158 @@
 import React, { useState, useEffect } from 'react'
-import { Box, Typography, CircularProgress } from '@mui/material'
+import {
+	Box,
+	Typography,
+	CircularProgress,
+	Button,
+	TextField,
+	Stack,
+} from '@mui/material'
 import dayjs from 'dayjs'
 import 'dayjs/locale/ru'
 import { LocalizationProvider, DateCalendar } from '@mui/x-date-pickers'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import { useParams } from 'react-router-dom'
-import { fetchAvailableSlots, AvailabilitySlot } from '../../api/calendar'
-import { TimeSlotAccordion } from '../WorkSchedulePicker/ui/TimeSlotAccordion'
+import { fetchAvailableSlots, createAppointment } from '../../api/calendar'
 
 dayjs.locale('ru')
 
+type Slot = {
+	id: number
+	start: string
+	end: string
+}
+
 const PatientAppointmentScheduler = () => {
-	const { id } = useParams<{ id: string }>() // Получаем id доктора из URL
-	const [selectedDate, setSelectedDate] = useState(dayjs()) // Выбранная дата
-	const [availableSlots, setAvailableSlots] = useState<AvailabilitySlot[]>([]) // Доступные слоты
-	const [isLoading, setIsLoading] = useState(false) // Состояние загрузки
-	const [selectedTimes, setSelectedTimes] = useState({}) // Выбранные временные слоты
+	const { id } = useParams<{ id: string }>()
+	const [selectedDate, setSelectedDate] = useState(dayjs())
+	const [availableSlots, setAvailableSlots] = useState<Slot[]>([])
+	const [isLoading, setIsLoading] = useState(false)
+	const [selectedSlotId, setSelectedSlotId] = useState<number | null>(null)
+	const [notes, setNotes] = useState('')
 
-	// Получение доступных слотов при изменении даты
 	useEffect(() => {
-		const fetchSlots = async () => {
-			if (!id) return // Если id отсутствует, выходим
-
-			setIsLoading(true)
-			try {
-				const slots = await fetchAvailableSlots(
-					parseInt(id), // Преобразуем id в число
-					selectedDate.format('YYYY-MM-DD')
-				)
-				setAvailableSlots(slots)
-			} catch (error) {
-				console.error('Ошибка при получении слотов:', error)
-			} finally {
-				setIsLoading(false)
-			}
-		}
-
 		fetchSlots()
-	}, [selectedDate, id]) // Зависимости: selectedDate и id
+	}, [id])
 
-	// Обработчик выбора времени
-	const handleTimeClick = time => {
-		const dateKey = selectedDate.format('YYYY-MM-DD')
-		const updatedSelectedTimes = { ...selectedTimes }
-
-		// Если для текущей даты нет выбранных времен, создаем пустой массив
-		if (!updatedSelectedTimes[dateKey]) {
-			updatedSelectedTimes[dateKey] = []
+	const fetchSlots = async () => {
+		if (!id) return
+		setIsLoading(true)
+		try {
+			const slots = await fetchAvailableSlots(parseInt(id))
+			setAvailableSlots(slots)
+		} catch (error) {
+			console.error('Ошибка при получении слотов:', error)
+		} finally {
+			setIsLoading(false)
 		}
-
-		// Если время уже выбрано, снимаем выбор
-		if (updatedSelectedTimes[dateKey].includes(time)) {
-			updatedSelectedTimes[dateKey] = updatedSelectedTimes[dateKey].filter(
-				t => t !== time
-			)
-		} else {
-			// Иначе выбираем новое время, удаляя предыдущее
-			updatedSelectedTimes[dateKey] = [time] // Оставляем только одно время
-		}
-
-		setSelectedTimes(updatedSelectedTimes)
 	}
 
-	// Группировка слотов по времени суток
-	const morningSlots = availableSlots
-		.filter(slot => {
-			const hour = dayjs(slot.start_time).hour()
-			return hour >= 6 && hour < 12
-		})
-		.map(slot => dayjs(slot.start_time).format('HH:mm'))
+	const slotsForSelectedDate = availableSlots.filter(slot =>
+		dayjs(slot.start).isSame(selectedDate, 'day')
+	)
 
-	const daySlots = availableSlots
-		.filter(slot => {
-			const hour = dayjs(slot.start_time).hour()
-			return hour >= 12 && hour < 18
-		})
-		.map(slot => dayjs(slot.start_time).format('HH:mm'))
+	const filterSlotsByTime = (startHour: number, endHour: number) =>
+		slotsForSelectedDate.filter(
+			slot =>
+				dayjs(slot.start).hour() >= startHour &&
+				dayjs(slot.start).hour() < endHour
+		)
 
-	const eveningSlots = availableSlots
-		.filter(slot => {
-			const hour = dayjs(slot.start_time).hour()
-			return hour >= 18 && hour < 24
-		})
-		.map(slot => dayjs(slot.start_time).format('HH:mm'))
+	const renderSlots = (title: string, slots: Slot[]) => (
+		<Box mt={3}>
+			<Typography variant="h6" mb={1}>
+				{title}
+			</Typography>
+			<Stack direction="row" spacing={1} flexWrap="wrap">
+				{slots.map(slot => (
+					<Button
+						key={slot.id}
+						variant={selectedSlotId === slot.id ? 'outlined' : 'contained'}
+						onClick={() => setSelectedSlotId(slot.id)}
+						sx={{ minWidth: '100px' }}
+					>
+						{dayjs(slot.start).format('HH:mm')} -{' '}
+						{dayjs(slot.end).format('HH:mm')}
+					</Button>
+				))}
+			</Stack>
+		</Box>
+	)
+
+	const handleSubmit = async () => {
+		if (!id || !selectedSlotId) {
+			alert('Выберите слот для записи')
+			return
+		}
+
+		const payload = {
+			appointment: {
+				doctor_id: parseInt(id),
+				availability_id: selectedSlotId,
+				notes,
+			},
+		}
+
+		try {
+			await createAppointment(payload)
+			alert('Запись успешно создана')
+			setSelectedSlotId(null)
+			setNotes('')
+			fetchSlots() // Обновляем слоты после записи
+		} catch (error) {
+			console.error('Ошибка при записи:', error)
+			alert('Ошибка при создании записи')
+		}
+	}
 
 	return (
-		<LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale='ru'>
-			<Box sx={{ padding: 2, maxWidth: 600, margin: 'auto' }}>
-				{/* Календарь */}
+		<Box p={2}>
+			<Typography variant="h5">Запись к врачу</Typography>
+
+			<LocalizationProvider dateAdapter={AdapterDayjs}>
 				<DateCalendar
 					value={selectedDate}
-					onChange={date => setSelectedDate(date)}
-					sx={{
-						width: '100%',
-						maxWidth: '900px',
-						minHeight: '355px',
-						boxShadow: '0px 12px 17px #0000000d',
-						borderRadius: '16px',
-						padding: '0px 5px',
-						'& .MuiPickersCalendarHeader-root': {
-							display: 'flex',
-							padding: '0px',
-							justifyContent: 'space-between',
-						},
-						'& .MuiPickersCalendarHeader-label': {
-							fontSize: '14px',
-							textTransform: 'capitalize',
-						},
-						'& .MuiPickersCalendarHeader-labelContainer': {
-							border: '2px solid gray',
-							borderRadius: '50px',
-							padding: '0px 0px 0px 15px',
-						},
-						'& .MuiPickersArrowSwitcher-root': {
-							fontSize: '1.5rem',
-						},
-						'& .MuiDayCalendar-weekDayLabel': {
-							fontSize: '14px',
-							textTransform: 'capitalize',
-						},
-						'& .MuiPickersDay-root': {
-							fontSize: '14px',
-						},
-						'& .MuiDayCalendar-weekContainer': {
-							justifyContent: 'space-between',
-						},
-						'& .MuiDayCalendar-header': {
-							justifyContent: 'space-between',
-						},
-						'& .MuiDayCalendar-slideTransition': {
-							minHeight: '260px',
-						},
-						'& .Mui-selected': {
-							background: '#f5f5f5  !important',
-							border: 'none',
-						},
-					}}
+					onChange={newDate => setSelectedDate(newDate!)}
 				/>
+			</LocalizationProvider>
 
-				{/* Доступные слоты */}
-				<Box sx={{ marginTop: 4 }}>
-					{!!availableSlots.length ? (
-						<>
-							{' '}
-							<Typography variant='h6' gutterBottom>
-								Доступные слоты на {selectedDate.format('DD.MM.YYYY')}
-							</Typography>
-							{isLoading ? (
-								<CircularProgress />
-							) : (
-								<>
-									{!!morningSlots.length && (
-										<TimeSlotAccordion
-											title='Утро'
-											times={morningSlots}
-											selectedTimes={
-												selectedTimes[selectedDate.format('YYYY-MM-DD')] || []
-											}
-											handleTimeClick={handleTimeClick}
-										/>
-									)}
-									{!!daySlots.length && (
-										<TimeSlotAccordion
-											title='День'
-											times={daySlots}
-											selectedTimes={
-												selectedTimes[selectedDate.format('YYYY-MM-DD')] || []
-											}
-											handleTimeClick={handleTimeClick}
-										/>
-									)}
-									{!!eveningSlots.length && (
-										<TimeSlotAccordion
-											title='Вечер'
-											times={eveningSlots}
-											selectedTimes={
-												selectedTimes[selectedDate.format('YYYY-MM-DD')] || []
-											}
-											handleTimeClick={handleTimeClick}
-										/>
-									)}
-								</>
-							)}
-						</>
-					) : (
-						<Typography variant='h6' gutterBottom>
-							Доступных слотов нет
+			{isLoading ? (
+				<CircularProgress />
+			) : (
+				<>
+					{slotsForSelectedDate.length === 0 ? (
+						<Typography mt={3}>
+							Нет доступных слотов на выбранную дату
 						</Typography>
+					) : (
+						<>
+							{renderSlots('Утро', filterSlotsByTime(6, 12))}
+							{renderSlots('День', filterSlotsByTime(12, 18))}
+							{renderSlots('Вечер', filterSlotsByTime(18, 24))}
+						</>
 					)}
-				</Box>
-			</Box>
-		</LocalizationProvider>
+				</>
+			)}
+
+			<TextField
+				label="Комментарий"
+				multiline
+				fullWidth
+				rows={3}
+				value={notes}
+				onChange={e => setNotes(e.target.value)}
+				sx={{ mt: 3 }}
+			/>
+
+			<Button
+				variant="contained"
+				color="primary"
+				sx={{ mt: 3 }}
+				onClick={handleSubmit}
+			>
+				Записаться
+			</Button>
+		</Box>
 	)
 }
 

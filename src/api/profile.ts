@@ -4,6 +4,7 @@ import axiosInstance from './instance';
 
 export interface User {
 	id: number
+	avatar_url:string |null
 	email: string
 	created_at: string
 	updated_at: string

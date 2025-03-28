@@ -18,6 +18,19 @@ import { useParams } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { getDoctorById } from '../../api/doctors'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
+import PatientAppointmentScheduler from '../PatientAppointmentScheduler/PatientAppointmentScheduler'
+
+
+import EmailIcon from '@mui/icons-material/Email'
+import PhoneIcon from '@mui/icons-material/Phone'
+import CakeIcon from '@mui/icons-material/Cake'
+import WcIcon from '@mui/icons-material/Wc'
+import WorkspacePremiumIcon from '@mui/icons-material/WorkspacePremium'
+import DescriptionIcon from '@mui/icons-material/Description'
+import InfoIcon from '@mui/icons-material/Info'
+import HealingIcon from '@mui/icons-material/Healing'
+
+
 
 const DoctorDetails: React.FC = () => {
 	const { id } = useParams<{ id: string }>()
@@ -67,96 +80,166 @@ const DoctorDetails: React.FC = () => {
 					sx={{
 						backgroundColor: '#1976d2',
 						color: '#fff',
-						borderRadius: '16px',
-						p: 3,
+						borderRadius: '20px',
+						p: 2.5,
 						display: 'flex',
 						alignItems: 'center',
-						mb: '8px',
-						boxShadow: '0 4px 10px rgba(0,0,0,0.15)',
+						mb: 2,
+						boxShadow: '0 8px 24px rgba(0,0,0,0.15)',
 					}}
 				>
 					<Avatar
+						src={avatar_url || undefined}
+						alt={`${first_name} ${last_name}`}
 						sx={{
-							width: 90,
-							height: 90,
-							mr: 3,
-							bgcolor: '#fff',
-							color: '#1976d2',
-							fontSize: 36,
-							border: '2px solid #fff',
+							width: 84,
+							height: 84,
+							mr: 2.5,
+							bgcolor: avatar_url ? 'transparent' : '#fff',
+							color: avatar_url ? '#fff' : '#1976d2',
+							fontSize: 34,
+							boxShadow: avatar_url ? '0 4px 12px rgba(0,0,0,0.2)' : 'none',
 						}}
-						src={avatar_url || ''}
 					>
-						{first_name?.[0]?.toUpperCase() || 'D'}
+						{!avatar_url && (first_name?.[0]?.toUpperCase() || 'D')}
 					</Avatar>
 
-					<Box>
-						<Box fontSize='1.3rem' fontWeight='bold'>
+					<Box sx={{ minWidth: 0 }}>
+						<Typography
+							variant="h6"
+							fontWeight={700}
+							noWrap
+							sx={{
+								fontSize: '1.25rem',
+								lineHeight: 1.3,
+								textOverflow: 'ellipsis',
+								overflow: 'hidden',
+							}}
+						>
 							{`${first_name ?? ''} ${middle_name ?? ''} ${last_name ?? ''}`}
-						</Box>
-						<Box mt={1} fontSize='0.95rem' color='rgba(255,255,255,0.85)'>
+						</Typography>
+
+						<Typography
+							variant="body2"
+							color="rgba(255,255,255,0.85)"
+							sx={{ mt: 0.5 }}
+							noWrap
+						>
 							{specialization ?? 'Специализация не указана'}
-						</Box>
+						</Typography>
 					</Box>
 				</Box>
 
 				{/* Аккордеон с информацией */}
 				<Accordion
+					elevation={3}
+					disableGutters
 					sx={{
-						marginBottom: '10px',
-						border: 'none',
-						borderRadius: '12px',
+						mb: 2,
+						borderRadius: 3,
+						overflow: 'hidden',
+						bgcolor: '#fff', // тело белое — для контраста
+						boxShadow: '0 6px 16px rgba(0, 0, 0, 0.06)',
 						'&:before': { display: 'none' },
-						
 					}}
 				>
-					<AccordionSummary expandIcon={<ExpandMoreIcon />}>
-						<Typography fontWeight='bold'>Информация о враче</Typography>
+					<AccordionSummary
+						expandIcon={
+							<ExpandMoreIcon sx={{ color: '#fff', fontSize: '1.6rem' }} />
+						}
+						sx={{
+							bgcolor: '#1876d2', // 🔵 твой цвет
+							px: 2,
+							py: 1.8,
+							'& .MuiAccordionSummary-content': {
+								alignItems: 'center',
+							},
+						}}
+					>
+						<Typography
+							fontWeight={600}
+							fontSize="1rem"
+							color="#fff"
+							sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
+						>
+							🩺 Информация о враче
+						</Typography>
 					</AccordionSummary>
-					<AccordionDetails sx={{ p: 1 }}>
-						<List dense>
-							<InfoRow label='Email' value={email} />
-							<InfoRow label='Телефон' value={phone} />
-							<InfoRow label='Дата рождения' value={date_of_birth} />
-							<InfoRow label='Пол' value={gender} />
-							<InfoRow label='Опыт' value={experience} />
-							<InfoRow label='Описание' value={description_for_patient} />
-							<InfoRow label='Биография' value={bio} />
-							<InfoRow label='Медицинская история' value={medical_history} />
-						</List>
+
+					<AccordionDetails sx={{ px: 2.5, py: 2 }}>
+						<InfoRow icon={<EmailIcon />} label="Email" value={email} />
+						<InfoRow icon={<PhoneIcon />} label="Телефон" value={phone} />
+						<InfoRow
+							icon={<CakeIcon />}
+							label="Дата рождения"
+							value={date_of_birth}
+						/>
+						<InfoRow icon={<WcIcon />} label="Пол" value={gender} />
+						<InfoRow
+							icon={<WorkspacePremiumIcon />}
+							label="Опыт"
+							value={experience}
+						/>
+						<InfoRow
+							icon={<DescriptionIcon />}
+							label="Описание"
+							value={description_for_patient}
+						/>
+						<InfoRow icon={<InfoIcon />} label="Биография" value={bio} />
+						<InfoRow
+							icon={<HealingIcon />}
+							label="Медицинская история"
+							value={medical_history}
+						/>
 					</AccordionDetails>
 				</Accordion>
 
-				{/* Аккордеон для записи */}
 				<Accordion
 					defaultExpanded
 					expanded={isAppointmentAccordionOpen}
 					onChange={() =>
 						setIsAppointmentAccordionOpen(!isAppointmentAccordionOpen)
 					}
+					elevation={3}
+					disableGutters
 					sx={{
-						marginBottom: '10px',
-						border: 'none',
-
-						borderRadius: '12px',
+						mb: 2,
+						borderRadius: 3,
+						overflow: 'hidden',
+						bgcolor: '#fefefe',
+						boxShadow: '0 6px 16px rgba(0, 0, 0, 0.06)',
 						'&:before': { display: 'none' },
 					}}
 				>
-					<AccordionSummary expandIcon={<ExpandMoreIcon />}>
-						<Typography fontWeight='bold'>Записаться на прием</Typography>
+					<AccordionSummary
+						expandIcon={
+							<ExpandMoreIcon
+								sx={{ color: 'primary.main', fontSize: '1.6rem' }}
+							/>
+						}
+						sx={{
+							bgcolor: '#ffd446',
+							px: 2,
+							py: 1.8,
+							'& .MuiAccordionSummary-content': {
+								alignItems: 'center',
+								gap: 1,
+							},
+						}}
+					>
+						<Typography
+							fontWeight={600}
+							fontSize="1rem"
+							color="success.main"
+							sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
+						>
+							📅 Записаться на приём
+						</Typography>
 					</AccordionSummary>
-					<AccordionDetails>
-						<Box textAlign='center' p={2}>
-							<Typography variant='body1' mb={3}>
-								Здесь будет календарь для записи на прием.
-							</Typography>
-							<Button
-								variant='contained'
-								color='primary'
-								onClick={() => setIsAppointmentAccordionOpen(true)}
-							>
-								Открыть календарь
-							</Button>
+
+					<AccordionDetails sx={{ px: 2.5, py: 2 }}>
+						<Box textAlign="center">
+							<PatientAppointmentScheduler />
 						</Box>
 					</AccordionDetails>
 				</Accordion>
@@ -166,28 +249,45 @@ const DoctorDetails: React.FC = () => {
 }
 
 // Компонент для отображения строки информации
-const InfoRow = ({ label, value }: { label: string; value: string | null }) => (
-	<ListItem
-		sx={{
-			mb: 1,
-			backgroundColor: '#fff',
-			borderRadius: '12px',
-			boxShadow: '0 1px 5px rgba(0,0,0,0.1)',
-			px: 1.5,
-			py: "5px",
-		}}
-	>
-		<ListItemText
-			primary={label}
-			primaryTypographyProps={{
-				fontWeight: 'bold',
-				fontSize: '0.9rem',
-				color: '#555',
+const InfoRow: React.FC<InfoRowProps> = ({ label, value, icon }) => {
+	if (!value) return null
+
+	return (
+		<Box
+			sx={{
+				display: 'flex',
+				alignItems: 'flex-start',
+				gap: 1.5,
+				mb: 2,
+				borderBottom: '1px solid #eee',
+				pb: 1,
 			}}
-			secondary={value ?? 'Не указано'}
-			secondaryTypographyProps={{ fontSize: '1rem', color: '#333' }}
-		/>
-	</ListItem>
-)
+		>
+			<Box
+				sx={{
+					mt: 0.5,
+					color: 'primary.main',
+					minWidth: 24,
+					display: 'flex',
+					justifyContent: 'center',
+				}}
+			>
+				{icon}
+			</Box>
+			<Box>
+				<Typography variant="caption" color="text.secondary">
+					{label}
+				</Typography>
+				<Typography
+					variant="body2"
+					fontWeight={500}
+					sx={{ lineHeight: 1.4, color: 'text.primary' }}
+				>
+					{value}
+				</Typography>
+			</Box>
+		</Box>
+	)
+}
 
 export default DoctorDetails
