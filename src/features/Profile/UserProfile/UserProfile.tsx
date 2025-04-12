@@ -15,7 +15,6 @@ import { logout } from '../../Authentication/authSlice'
 import { useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 
-
 import EditIcon from '@mui/icons-material/Edit'
 import SaveIcon from '@mui/icons-material/Save'
 import LogoutIcon from '@mui/icons-material/Logout'
@@ -26,15 +25,22 @@ import InputAdornment from '@mui/material/InputAdornment'
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth'
 import WcIcon from '@mui/icons-material/Wc'
 
-
 import InfoIcon from '@mui/icons-material/Info'
 import MedicalInformationIcon from '@mui/icons-material/MedicalInformation'
 import WorkIcon from '@mui/icons-material/Work'
+import {
+	deletedPatientRecord,
+	getPatientRecord,
+	updatePatientRecord,
+} from '../../../api/pacoent'
 
 export default function UserProfile() {
 	const queryClient = useQueryClient()
 	const dispatch = useDispatch()
 	const navigate = useNavigate()
+	const [appointments, setAppointments] = useState([])
+	const [editingAppointmentId, setEditingAppointmentId] = useState(null)
+	const [appointmentNotes, setAppointmentNotes] = useState('')
 
 	const {
 		data: userData,
@@ -44,6 +50,21 @@ export default function UserProfile() {
 		queryKey: ['currentUser'],
 		queryFn: fetchCurrentUser,
 	})
+
+	const fetchAppointments = async () => {
+		try {
+			const data = await getPatientRecord()
+			console.log('data', data)
+
+			setAppointments(data)
+		} catch (error) {
+			console.error('Ошибка загрузки записей:', error)
+		}
+	}
+
+	useEffect(() => {
+		fetchAppointments()
+	}, [])
 
 	// Мутация для обновления данных пользователя
 	const updateUserMutation = useMutation({
@@ -83,7 +104,7 @@ export default function UserProfile() {
 			setUser({
 				id: userData.id,
 				email: userData.email,
-				avatar_url:userData.avatar_url,
+				avatar_url: userData.avatar_url,
 				created_at: userData.created_at,
 				updated_at: userData.updated_at,
 				role: userData.role,
@@ -108,6 +129,8 @@ export default function UserProfile() {
 		const { name, value } = e.target
 		setUser(prevUser => ({ ...prevUser, [name]: value }))
 	}
+
+	console.log('appointments', appointments)
 
 	// Сохранение изменений
 	const handleSave = async () => {
@@ -190,10 +213,10 @@ export default function UserProfile() {
 					</Avatar>
 
 					<Box>
-						<Typography variant="h5">
+						<Typography variant='h5'>
 							{user.first_name} {user.last_name}
 						</Typography>
-						<Typography variant="subtitle1" color="textSecondary">
+						<Typography variant='subtitle1' color='textSecondary'>
 							Роль: {user.role === 'doctor' ? 'Доктор' : 'Пациент'}
 						</Typography>
 					</Box>
@@ -201,7 +224,7 @@ export default function UserProfile() {
 				{/* Кнопка редактирования */}
 				<Box sx={{ display: 'flex', gap: 2, mb: 3 }}>
 					<Button
-						variant="contained"
+						variant='contained'
 						color={isEditing ? 'success' : 'primary'}
 						startIcon={isEditing ? <SaveIcon /> : <EditIcon />}
 						onClick={isEditing ? handleSave : toggleEditing}
@@ -211,8 +234,8 @@ export default function UserProfile() {
 					</Button>
 
 					<Button
-						variant="outlined"
-						color="error"
+						variant='outlined'
+						color='error'
 						startIcon={<LogoutIcon />}
 						onClick={handleLogout}
 						sx={{ borderRadius: 2, boxShadow: 1, textTransform: 'none' }}
@@ -222,65 +245,65 @@ export default function UserProfile() {
 				</Box>
 				{/* Основная информация */}
 				<Paper sx={{ padding: 2, marginBottom: 3 }}>
-					<Typography variant="h6" gutterBottom>
-						Основная информация
+					<Typography variant='h6' gutterBottom>
+						Основная информация:
 					</Typography>
 					{isEditing ? (
 						<Box
 							sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 2 }}
 						>
 							<TextField
-								label="Имя"
-								name="first_name"
+								label='Имя'
+								name='first_name'
 								value={user.first_name}
 								onChange={handleInputChange}
 								fullWidth
 								InputProps={{
 									startAdornment: (
-										<InputAdornment position="start">
-											<PersonIcon color="action" />
+										<InputAdornment position='start'>
+											<PersonIcon color='action' />
 										</InputAdornment>
 									),
 								}}
 							/>
 							<TextField
-								label="Фамилия"
-								name="last_name"
+								label='Фамилия'
+								name='last_name'
 								value={user.last_name}
 								onChange={handleInputChange}
 								fullWidth
 								InputProps={{
 									startAdornment: (
-										<InputAdornment position="start">
-											<PersonIcon color="action" />
+										<InputAdornment position='start'>
+											<PersonIcon color='action' />
 										</InputAdornment>
 									),
 								}}
 							/>
 							<TextField
-								label="Отчество"
-								name="middle_name"
+								label='Отчество'
+								name='middle_name'
 								value={user.middle_name || ''}
 								onChange={handleInputChange}
 								fullWidth
 								InputProps={{
 									startAdornment: (
-										<InputAdornment position="start">
-											<BadgeIcon color="action" />
+										<InputAdornment position='start'>
+											<BadgeIcon color='action' />
 										</InputAdornment>
 									),
 								}}
 							/>
 							<TextField
-								label="Телефон"
-								name="phone"
+								label='Телефон'
+								name='phone'
 								value={user.phone}
 								onChange={handleInputChange}
 								fullWidth
 								InputProps={{
 									startAdornment: (
-										<InputAdornment position="start">
-											<PhoneIphoneIcon color="action" />
+										<InputAdornment position='start'>
+											<PhoneIphoneIcon color='action' />
 										</InputAdornment>
 									),
 								}}
@@ -291,48 +314,48 @@ export default function UserProfile() {
 							sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 2 }}
 						>
 							<Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-								<PersonIcon color="action" />
+								<PersonIcon color='action' />
 								<Box>
-									<Typography variant="caption" color="text.secondary">
+									<Typography variant='caption' color='text.secondary'>
 										Имя
 									</Typography>
-									<Typography variant="body1">
+									<Typography variant='body1'>
 										{user.first_name || 'Не указано'}
 									</Typography>
 								</Box>
 							</Box>
 
 							<Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-								<PersonIcon color="action" />
+								<PersonIcon color='action' />
 								<Box>
-									<Typography variant="caption" color="text.secondary">
+									<Typography variant='caption' color='text.secondary'>
 										Фамилия
 									</Typography>
-									<Typography variant="body1">
+									<Typography variant='body1'>
 										{user.last_name || 'Не указано'}
 									</Typography>
 								</Box>
 							</Box>
 
 							<Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-								<BadgeIcon color="action" />
+								<BadgeIcon color='action' />
 								<Box>
-									<Typography variant="caption" color="text.secondary">
+									<Typography variant='caption' color='text.secondary'>
 										Отчество
 									</Typography>
-									<Typography variant="body1">
+									<Typography variant='body1'>
 										{user.middle_name || 'Не указано'}
 									</Typography>
 								</Box>
 							</Box>
 
 							<Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-								<PhoneIphoneIcon color="action" />
+								<PhoneIphoneIcon color='action' />
 								<Box>
-									<Typography variant="caption" color="text.secondary">
+									<Typography variant='caption' color='text.secondary'>
 										Телефон
 									</Typography>
-									<Typography variant="body1">
+									<Typography variant='body1'>
 										{user.phone || 'Не указано'}
 									</Typography>
 								</Box>
@@ -341,6 +364,154 @@ export default function UserProfile() {
 					)}
 				</Paper>
 				{/* Поля для пациента */}
+
+				{/* Блок записей к врачу */}
+				<Paper sx={{ boxShadow: 'none', marginBottom:3 }}>
+					<Typography variant='h6' gutterBottom>
+						Мои записи к врачу:
+					</Typography>
+
+					{appointments.length > 0 ? (
+						<Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+							{appointments.map(appointment => (
+								<Paper
+									key={appointment.appointment_id}
+									sx={{
+										p: 2,
+										display: 'flex',
+										flexDirection: 'column',
+										gap: 1,
+										borderLeft: '4px solid',
+										borderColor: 'primary.main',
+									}}
+								>
+									<Box
+										sx={{
+											display: 'flex',
+											flexDirection: { xs: 'column', sm: 'row' },
+											justifyContent: 'space-between',
+										}}
+									>
+										<Typography variant='subtitle1'>
+											Доктор: {appointment.doctor.name}
+										</Typography>
+										<Typography variant='body2' color='text.secondary'>
+											{appointment.date}
+										</Typography>
+									</Box>
+
+									<Typography variant='body2'>
+										Время: {appointment.time}
+									</Typography>
+
+									{appointment.notes && (
+										<Typography variant='body2'>
+											Примечание: {appointment.notes}
+										</Typography>
+									)}
+
+									<Box
+										sx={{
+											display: 'flex',
+											gap: 1,
+											mt: 1,
+											flexDirection: { xs: 'column', sm: 'row' },
+										}}
+									>
+										<Button
+											variant='contained'
+											color={'primary'}
+											size='small'
+											fullWidth={{ xs: true, sm: false }}
+											onClick={() => {
+												setEditingAppointmentId(appointment.appointment_id)
+												setAppointmentNotes(appointment.notes || '')
+											}}
+											sx={{
+												minWidth: { xs: 'unset', sm: '100px' },
+												whiteSpace: 'nowrap',
+											}}
+										>
+											Редактировать
+										</Button>
+										<Button
+											variant='outlined'
+											color='error'
+											size='small'
+											fullWidth={{ xs: true, sm: false }}
+											onClick={async () => {
+												try {
+													await deletedPatientRecord(appointment.appointment_id)
+													await fetchAppointments()
+												} catch (error) {
+													console.error('Ошибка при отмене записи:', error)
+												}
+											}}
+											sx={{
+												minWidth: { xs: 'unset', sm: '100px' },
+												whiteSpace: 'nowrap',
+											}}
+										>
+											Отменить запись
+										</Button>
+									</Box>
+
+									{editingAppointmentId === appointment.appointment_id && (
+										<Box
+											sx={{
+												display: 'flex',
+												gap: 1,
+												mt: 1,
+												alignItems: 'center',
+												flexDirection: { xs: 'column', sm: 'row' },
+											}}
+										>
+											<TextField
+												value={appointmentNotes}
+												onChange={e => setAppointmentNotes(e.target.value)}
+												size='small'
+												fullWidth
+											/>
+											<Box
+												sx={{
+													display: 'flex',
+													gap: 1,
+													width: { xs: '100%', sm: 'auto' },
+												}}
+											>
+												<Button
+													variant='contained'
+													fullWidth={{ xs: true, sm: false }}
+													onClick={async () => {
+														await updatePatientRecord(
+															appointment.appointment_id,
+															appointmentNotes
+														)
+														setEditingAppointmentId(null)
+														fetchAppointments()
+													}}
+												>
+													Сохранить
+												</Button>
+												<Button
+													variant='primary'
+													fullWidth={{ xs: true, sm: false }}
+													onClick={() => setEditingAppointmentId(null)}
+												>
+													Отмена
+												</Button>
+											</Box>
+										</Box>
+									)}
+								</Paper>
+							))}
+						</Box>
+					) : (
+						<Typography variant='body2' color='text.secondary'>
+							У вас нет запланированных записей к врачу
+						</Typography>
+					)}
+				</Paper>
 
 				{user.role === 'patient' && (
 					<Paper
@@ -352,8 +523,8 @@ export default function UserProfile() {
 							backgroundColor: '#f9f9f9',
 						}}
 					>
-						<Typography variant="h6" gutterBottom>
-							🩺 Информация о пациенте
+						<Typography variant='h6' gutterBottom>
+							🩺 Информация о пациенте:
 						</Typography>
 
 						{isEditing ? (
@@ -361,11 +532,11 @@ export default function UserProfile() {
 								sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 1 }}
 							>
 								<TextField
-									label="Дата рождения"
-									name="date_of_birth"
+									label='Дата рождения'
+									name='date_of_birth'
 									value={user.date_of_birth || ''}
 									onChange={handleInputChange}
-									type="date"
+									type='date'
 									fullWidth
 									InputLabelProps={{ shrink: true }}
 									InputProps={{
@@ -377,8 +548,8 @@ export default function UserProfile() {
 									}}
 								/>
 								<TextField
-									label="Пол"
-									name="gender"
+									label='Пол'
+									name='gender'
 									value={user.gender || ''}
 									onChange={handleInputChange}
 									select
@@ -390,9 +561,9 @@ export default function UserProfile() {
 									}}
 									SelectProps={{ native: true }}
 								>
-									<option value="">Не указан</option>
-									<option value="male">Мужской</option>
-									<option value="female">Женский</option>
+									<option value=''>Не указан</option>
+									<option value='male'>Мужской</option>
+									<option value='female'>Женский</option>
 								</TextField>
 							</Box>
 						) : (
@@ -404,10 +575,10 @@ export default function UserProfile() {
 										sx={{ alignSelf: 'end', color: 'action.active' }}
 									/>
 									<Box>
-										<Typography variant="caption" color="text.secondary">
+										<Typography variant='caption' color='text.secondary'>
 											Дата рождения
 										</Typography>
-										<Typography variant="body1">
+										<Typography variant='body1'>
 											{user.date_of_birth || 'Не указано'}
 										</Typography>
 									</Box>
@@ -416,10 +587,10 @@ export default function UserProfile() {
 								<Box sx={{ display: 'flex', gap: 1 }}>
 									<WcIcon sx={{ alignSelf: 'end', color: 'action.active' }} />
 									<Box>
-										<Typography variant="caption" color="text.secondary">
+										<Typography variant='caption' color='text.secondary'>
 											Пол
 										</Typography>
-										<Typography variant="body1">
+										<Typography variant='body1'>
 											{user.gender || 'Не указано'}
 										</Typography>
 									</Box>
@@ -441,7 +612,7 @@ export default function UserProfile() {
 							backgroundColor: '#f9f9f9',
 						}}
 					>
-						<Typography variant="h6" gutterBottom>
+						<Typography variant='h6' gutterBottom>
 							Информация о докторе
 						</Typography>
 
@@ -450,11 +621,11 @@ export default function UserProfile() {
 								sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 1 }}
 							>
 								<TextField
-									label="Дата рождения"
-									name="date_of_birth"
+									label='Дата рождения'
+									name='date_of_birth'
 									value={user.date_of_birth || ''}
 									onChange={handleInputChange}
-									type="date"
+									type='date'
 									fullWidth
 									InputLabelProps={{ shrink: true }}
 									InputProps={{
@@ -466,8 +637,8 @@ export default function UserProfile() {
 									}}
 								/>
 								<TextField
-									label="Пол"
-									name="gender"
+									label='Пол'
+									name='gender'
 									value={user.gender || ''}
 									onChange={handleInputChange}
 									select
@@ -479,13 +650,13 @@ export default function UserProfile() {
 									}}
 									SelectProps={{ native: true }}
 								>
-									<option value="">Не указан</option>
-									<option value="male">Мужской</option>
-									<option value="female">Женский</option>
+									<option value=''>Не указан</option>
+									<option value='male'>Мужской</option>
+									<option value='female'>Женский</option>
 								</TextField>
 								<TextField
-									label="Биография"
-									name="bio"
+									label='Биография'
+									name='bio'
 									value={user.bio || ''}
 									onChange={handleInputChange}
 									fullWidth
@@ -504,8 +675,8 @@ export default function UserProfile() {
 									}}
 								/>
 								<TextField
-									label="Специализация"
-									name="specialization"
+									label='Специализация'
+									name='specialization'
 									value={user.specialization || ''}
 									onChange={handleInputChange}
 									fullWidth
@@ -518,12 +689,12 @@ export default function UserProfile() {
 									}}
 								/>
 								<TextField
-									label="Опыт работы (лет)"
-									name="experience"
+									label='Опыт работы (лет)'
+									name='experience'
 									value={user.experience || ''}
 									onChange={handleInputChange}
 									fullWidth
-									type="number"
+									type='number'
 									InputProps={{
 										startAdornment: (
 											<WorkIcon sx={{ mr: 1, color: 'action.active' }} />
@@ -540,22 +711,24 @@ export default function UserProfile() {
 										sx={{ alignSelf: 'center', color: 'action.active' }}
 									/>
 									<Box>
-										<Typography variant="caption" color="text.secondary">
+										<Typography variant='caption' color='text.secondary'>
 											Дата рождения
 										</Typography>
-										<Typography variant="body1">
+										<Typography variant='body1'>
 											{user.date_of_birth || 'Не указано'}
 										</Typography>
 									</Box>
 								</Box>
 
 								<Box sx={{ display: 'flex', gap: 1 }}>
-									<WcIcon sx={{ alignSelf: 'center', color: 'action.active' }} />
+									<WcIcon
+										sx={{ alignSelf: 'center', color: 'action.active' }}
+									/>
 									<Box>
-										<Typography variant="caption" color="text.secondary">
+										<Typography variant='caption' color='text.secondary'>
 											Пол
 										</Typography>
-										<Typography variant="body1">
+										<Typography variant='body1'>
 											{user.gender || 'Не указано'}
 										</Typography>
 									</Box>
@@ -566,10 +739,10 @@ export default function UserProfile() {
 										sx={{ alignSelf: 'center', color: 'action.active' }}
 									/>
 									<Box>
-										<Typography variant="caption" color="text.secondary">
+										<Typography variant='caption' color='text.secondary'>
 											Биография
 										</Typography>
-										<Typography variant="body1">
+										<Typography variant='body1'>
 											{user.bio || 'Не указано'}
 										</Typography>
 									</Box>
@@ -580,22 +753,24 @@ export default function UserProfile() {
 										sx={{ alignSelf: 'center', color: 'action.active' }}
 									/>
 									<Box>
-										<Typography variant="caption" color="text.secondary">
+										<Typography variant='caption' color='text.secondary'>
 											Специализация
 										</Typography>
-										<Typography variant="body1">
+										<Typography variant='body1'>
 											{user.specialization || 'Не указано'}
 										</Typography>
 									</Box>
 								</Box>
 
 								<Box sx={{ display: 'flex', gap: 1 }}>
-									<WorkIcon sx={{ alignSelf: 'center', color: 'action.active' }} />
+									<WorkIcon
+										sx={{ alignSelf: 'center', color: 'action.active' }}
+									/>
 									<Box>
-										<Typography variant="caption" color="text.secondary">
+										<Typography variant='caption' color='text.secondary'>
 											Опыт работы
 										</Typography>
-										<Typography variant="body1">
+										<Typography variant='body1'>
 											{user.experience || 'Не указано'}
 										</Typography>
 									</Box>

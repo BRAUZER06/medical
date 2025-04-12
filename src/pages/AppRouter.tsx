@@ -10,23 +10,26 @@ import ProtectedRoute from './ProtectedRoute'
 import PatientAppointmentScheduler from '../components/PatientAppointmentScheduler/PatientAppointmentScheduler'
 import DoctorsList from '../components/DoctorsList/DoctorsList'
 import DoctorDetails from '../components/DoctorDetails/DoctorDetails'
+import DoctorSchedule from '../components/WorkSchedulePicker/DoctorSchedule'
+
 
 
 const AppRouter = () => (
 	<Router>
-		<div style={{ marginBottom: '56px' }}>
+		<div style={{ maxWidth: 600, padding: '0px 8px', margin: '0 auto 65px' }}>
 			<Routes>
 				{/* Открытые маршруты */}
-				<Route path="/register" element={<RegisterUser />} />
-				<Route path="/login" element={<LoginUser />} />
-				<Route path="/" element={<HomePages />} />
+				<Route path='/register' element={<RegisterUser />} />
+				<Route path='/login' element={<LoginUser />} />
+				<Route path='/' element={<HomePages />} />
 
-				<Route path="/doctors" element={<DoctorsList />} />
-				<Route path="/doctors/:id" element={<DoctorDetails />} />
 				{/* Защищённые маршруты (видны только после авторизации) */}
 				<Route element={<ProtectedRoute />}>
-					<Route path="/about" element={<About />} />
-					<Route path="/profile" element={<UserProfile />} />
+					<Route path='/about' element={<About />} />
+					<Route path='/profile' element={<UserProfile />} />
+					<Route path='/calendar' element={<DoctorSchedule />} />
+					<Route path='/doctors' element={<DoctorsList />} />
+					<Route path='/doctors/:id' element={<DoctorDetails />} />
 					{/* Новый маршрут для записи к врачу */}
 
 					{/* <Route
@@ -39,7 +42,7 @@ const AppRouter = () => (
 				</Route>
 
 				{/* Страница 404 */}
-				<Route path="*" element={<NotFoundPage />} />
+				<Route path='*' element={<NotFoundPage />} />
 			</Routes>
 		</div>
 		<BottomNav />

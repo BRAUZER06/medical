@@ -94,7 +94,7 @@ export default function RegisterUser() {
 				password: formData.password,
 			})
 
-			localStorage.setItem('token', loginResponse.token)
+
 			queryClient.invalidateQueries(['user'])
 
 			setSuccessMessage('Регистрация и вход выполнены успешно!')

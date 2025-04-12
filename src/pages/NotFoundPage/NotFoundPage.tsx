@@ -1,47 +1,55 @@
-import React, { useState } from 'react'
-import { Button } from '@mui/material'
+import React from 'react'
+import { Button, Typography, Box } from '@mui/material'
 import { useNavigate } from 'react-router-dom'
+import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline'
+import { motion } from 'framer-motion'
 import styles from './NotFoundPage.module.scss'
 
 const NotFoundPage: React.FC = () => {
 	const navigate = useNavigate()
-	const [showSecondButton, setShowSecondButton] = useState(false) 
-
-	const goBack = () => {
-		navigate(-1)
-	}
-
-	const handleFirstButtonClick = () => {
-		setShowSecondButton(true) 
-	}
 
 	return (
-		<div className={styles.pageWrapper}>
-			<div className={styles.errorContent}>
-				<h1 className={styles.title}>404</h1>
-				<p className={styles.message}>Страница не найдена</p>
+		<Box className={styles.pageWrapper}>
+			<motion.div
+				initial={{ opacity: 0, y: -20 }}
+				animate={{ opacity: 1, y: 0 }}
+				transition={{ duration: 0.5 }}
+				className={styles.errorContent}
+			>
+				<ErrorOutlineIcon sx={{ fontSize: 80, color: '#1976d2', mb: 2 }} />
 
-				{!showSecondButton ? (
+				<Typography variant='h2' className={styles.title}>
+					404
+				</Typography>
+
+				<Typography variant='h6' className={styles.message}>
+					Упс! Эта страница недоступна или ещё в разработке.
+				</Typography>
+
+				<Box
+					mt={4}
+					display='flex'
+					gap={2}
+					flexWrap='wrap'
+					justifyContent='center'
+				>
 					<Button
 						variant='contained'
 						color='primary'
-						onClick={handleFirstButtonClick}
-						className={styles.backButton}
+						onClick={() => navigate(-1)}
 					>
-						Нажми если ты черт
+						Назад
 					</Button>
-				) : (
 					<Button
 						variant='contained'
 						color='primary'
-						onClick={goBack}
-						className={styles.backButton}
+						onClick={() => navigate('/')}
 					>
-						Ля ты краса!
+						На главную
 					</Button>
-				)}
-			</div>
-		</div>
+				</Box>
+			</motion.div>
+		</Box>
 	)
 }
 

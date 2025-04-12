@@ -1,17 +1,30 @@
-import SecureStorage from 'react-secure-storage'
-
 const TOKEN_KEY = 'jwt_token'
 
 export const getToken = (): string | null => {
-	return SecureStorage.getItem(TOKEN_KEY) as string | null
+	try {
+		return localStorage.getItem(TOKEN_KEY)
+	} catch (error) {
+		console.error('Error getting token from localStorage:', error)
+		return null
+	}
 }
 
 export const setToken = (token: string) => {
-	SecureStorage.setItem(TOKEN_KEY, token)
+	try {
+		localStorage.setItem(TOKEN_KEY, token)
+	} catch (error) {
+		console.error('Error setting token in localStorage:', error)
+	}
 }
 
 export const removeToken = () => {
-	SecureStorage.removeItem(TOKEN_KEY)
+	try {
+		localStorage.removeItem(TOKEN_KEY)
+	} catch (error) {
+		console.error('Error removing token from localStorage:', error)
+	}
 }
 
-export const isAuthenticated = (): boolean => !!getToken()
+export const isAuthenticated = (): boolean => {
+	return !!getToken()
+}

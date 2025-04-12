@@ -37,7 +37,7 @@ const DoctorsList: React.FC = () => {
 	}
 
 	return (
-		<Box sx={{ p: 2, maxWidth: 800, mx: 'auto' }}>
+		<Box sx={{ p:1, pt:2, pb:2, maxWidth: 800, mx: 'auto' }}>
 			{/* Заголовок страницы */}
 			<Paper
 				elevation={3}

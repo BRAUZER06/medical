@@ -108,7 +108,7 @@ export default function DoctorSchedule() {
 				key={slot.id}
 				title={isBooked && slot.booking ? slot.booking.comment : ''}
 				arrow
-				placement="top"
+				placement='top'
 			>
 				<Box
 					sx={{
@@ -180,17 +180,72 @@ export default function DoctorSchedule() {
 
 	return (
 		<LocalizationProvider dateAdapter={AdapterDayjs}>
-			<Box sx={{ display: 'flex', gap: 4 }}>
+			<Box
+				sx={{
+					display: 'flex',
+					gap: 4,
+					flexDirection: 'column',
+					alignItems: 'center',
+					maxWidth: '600px',
+					margin: '0 auto',
+					
+				}}
+			>
 				<DateCalendar
 					value={selectedDate}
 					onChange={handleDateChange}
 					disabled={!!mode}
+					sx={{
+						width: '100%',
+						maxWidth: '900px',
+						minHeight: '355px',
+						boxShadow: '0px 12px 17px #0000000d',
+						borderRadius: '16px',
+						padding: '0px 8px',
+						'& .MuiPickersCalendarHeader-root': {
+							display: 'flex',
+							padding: '0px',
+							justifyContent: 'space-between',
+						},
+						'& .MuiPickersCalendarHeader-label': {
+							fontSize: '14px',
+							textTransform: 'capitalize',
+						},
+						'& .MuiPickersCalendarHeader-labelContainer': {
+							border: '2px solid gray',
+							borderRadius: '50px',
+							padding: '0px 0px 0px 15px',
+						},
+						'& .MuiPickersArrowSwitcher-root': {
+							fontSize: '1.5rem',
+						},
+						'& .MuiDayCalendar-weekDayLabel': {
+							fontSize: '14px',
+							textTransform: 'capitalize',
+						},
+						'& .MuiPickersDay-root': {
+							fontSize: '14px',
+						},
+						'& .MuiDayCalendar-weekContainer': {
+							justifyContent: 'space-between',
+						},
+						'& .MuiDayCalendar-header': {
+							justifyContent: 'space-between',
+						},
+						'& .MuiDayCalendar-slideTransition': {
+							minHeight: '260px',
+						},
+						'& .Mui-selected': {
+							background: '#f5f5f5  !important',
+							border: 'none',
+						},
+					}}
 				/>
 
 				<Box sx={{ flexGrow: 1 }}>
 					{periods.map(period => (
 						<Box key={period.label} sx={{ mb: 2 }}>
-							<Typography variant="h6">{period.label}</Typography>
+							<Typography variant='h6'>{period.label}</Typography>
 							<Box sx={{ display: 'flex', flexWrap: 'wrap' }}>
 								{getSlotsByPeriod(period.start, period.end).map(renderSlot)}
 							</Box>
@@ -200,20 +255,20 @@ export default function DoctorSchedule() {
 					{!mode && (
 						<>
 							<Button
-								variant="contained"
+								variant='contained'
 								onClick={() => setMode('add')}
 								sx={{ mr: 2 }}
 							>
 								Добавить
 							</Button>
-							<Button variant="contained" onClick={() => setMode('delete')}>
+							<Button variant='contained' onClick={() => setMode('delete')}>
 								Удалить
 							</Button>
 						</>
 					)}
 
 					{mode && (
-						<Button variant="contained" onClick={handleSave}>
+						<Button variant='contained' onClick={handleSave}>
 							Сохранить
 						</Button>
 					)}

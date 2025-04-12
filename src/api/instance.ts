@@ -1,14 +1,13 @@
 import axios from 'axios'
 import { getToken } from '../utils/jwt'
 
-const API_BASE_URL = 'https://99a6-138-124-187-109.ngrok-free.app'
+const API_BASE_URL = 'https://6f5f-45-153-24-10.ngrok-free.app'
 
 const axiosInstance = axios.create({
 	baseURL: API_BASE_URL,
 	headers: {
 		Accept: 'application/json',
 		'Content-Type': 'application/json',
-
 		'ngrok-skip-browser-warning': 'true',
 	},
 })

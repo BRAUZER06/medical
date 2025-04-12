@@ -4,6 +4,7 @@ import store from './store'
 import { createTheme, ThemeProvider } from '@mui/material/styles'
 import CssBaseline from '@mui/material/CssBaseline'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { getToken } from './utils/jwt'
 
 const theme = createTheme({
 	palette: {
@@ -44,7 +45,10 @@ const theme = createTheme({
 	},
 })
 const App = () => {
-	
+			const token = getToken()
+
+			console.log('token', token)
+			
 	const queryClient = new QueryClient()
 	
 	return (

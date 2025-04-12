@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
-import secureStorage from 'react-secure-storage' // Импортируем secureStorage
+
 
 // Определяем типы для пользователя
 interface User {
@@ -35,8 +35,8 @@ const authSlice = createSlice({
 			state.user = action.payload.user
 			state.token = action.payload.token
 			state.isAuthenticated = true
-			localStorage.setItem('token', action.payload.token) 
-			secureStorage.setItem('jwt_token', action.payload.token) 
+	
+			localStorage.setItem('jwt_token', action.payload.token) 
 		},
 		// Обновляем данные пользователя
 		updateUser(state, action: PayloadAction<Partial<User>>) {
@@ -49,8 +49,8 @@ const authSlice = createSlice({
 			state.user = null
 			state.token = null
 			state.isAuthenticated = false
-			localStorage.removeItem('token') 
-			secureStorage.removeItem('jwt_token') 
+		
+			localStorage.removeItem('jwt_token') 
 		},
 	},
 })

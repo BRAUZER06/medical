@@ -69,6 +69,9 @@ const DoctorDetails: React.FC = () => {
 		avatar_url,
 	} = doctor.attributes
 
+	console.log('avatar_url', avatar_url)
+	
+
 	return (
 		<Box sx={{ p: '4px', maxWidth: 600, mx: 'auto' }}>
 			<Paper
@@ -106,7 +109,7 @@ const DoctorDetails: React.FC = () => {
 
 					<Box sx={{ minWidth: 0 }}>
 						<Typography
-							variant="h6"
+							variant='h6'
 							fontWeight={700}
 							noWrap
 							sx={{
@@ -120,8 +123,8 @@ const DoctorDetails: React.FC = () => {
 						</Typography>
 
 						<Typography
-							variant="body2"
-							color="rgba(255,255,255,0.85)"
+							variant='body2'
+							color='rgba(255,255,255,0.85)'
 							sx={{ mt: 0.5 }}
 							noWrap
 						>
@@ -158,8 +161,8 @@ const DoctorDetails: React.FC = () => {
 					>
 						<Typography
 							fontWeight={600}
-							fontSize="1rem"
-							color="#fff"
+							fontSize='1rem'
+							color='#fff'
 							sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
 						>
 							🩺 Информация о враче
@@ -167,28 +170,28 @@ const DoctorDetails: React.FC = () => {
 					</AccordionSummary>
 
 					<AccordionDetails sx={{ px: 2.5, py: 2 }}>
-						<InfoRow icon={<EmailIcon />} label="Email" value={email} />
-						<InfoRow icon={<PhoneIcon />} label="Телефон" value={phone} />
+						<InfoRow icon={<EmailIcon />} label='Email' value={email} />
+						<InfoRow icon={<PhoneIcon />} label='Телефон' value={phone} />
 						<InfoRow
 							icon={<CakeIcon />}
-							label="Дата рождения"
+							label='Дата рождения'
 							value={date_of_birth}
 						/>
-						<InfoRow icon={<WcIcon />} label="Пол" value={gender} />
+						<InfoRow icon={<WcIcon />} label='Пол' value={gender} />
 						<InfoRow
 							icon={<WorkspacePremiumIcon />}
-							label="Опыт"
+							label='Опыт'
 							value={experience}
 						/>
 						<InfoRow
 							icon={<DescriptionIcon />}
-							label="Описание"
+							label='Описание'
 							value={description_for_patient}
 						/>
-						<InfoRow icon={<InfoIcon />} label="Биография" value={bio} />
+						<InfoRow icon={<InfoIcon />} label='Биография' value={bio} />
 						<InfoRow
 							icon={<HealingIcon />}
-							label="Медицинская история"
+							label='Медицинская история'
 							value={medical_history}
 						/>
 					</AccordionDetails>
@@ -229,8 +232,8 @@ const DoctorDetails: React.FC = () => {
 					>
 						<Typography
 							fontWeight={600}
-							fontSize="1rem"
-							color="success.main"
+							fontSize='1rem'
+							color='success.main'
 							sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
 						>
 							📅 Записаться на приём
@@ -238,7 +241,7 @@ const DoctorDetails: React.FC = () => {
 					</AccordionSummary>
 
 					<AccordionDetails sx={{ px: 2.5, py: 2 }}>
-						<Box textAlign="center">
+						<Box textAlign='center'>
 							<PatientAppointmentScheduler />
 						</Box>
 					</AccordionDetails>

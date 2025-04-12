@@ -33,7 +33,7 @@ const PatientHistory: React.FC<PatientHistoryProps> = ({ visits }) => {
 			}}
 		>
 			<Typography variant="h6" gutterBottom>
-				🧾 История посещений
+				🧾 История посещений:
 			</Typography>
 
 			{displayedVisits.length > 0 ? (

@@ -6,14 +6,13 @@ import PatientAppointmentScheduler from '../../components/PatientAppointmentSche
 import DoctorSchedule from '../../components/WorkSchedulePicker/DoctorSchedule'
 
 export default function HomePages() {
-  return (
+	return (
 		<>
-			{/* <Home /> */}
+			<Home />
 			{/* <WorkSchedulePicker /> */}
-<DoctorSchedule/>
+			{/* <DoctorSchedule/> */}
 
-{/* 
-			<PatientAppointmentScheduler /> */}
+			{/* <PatientAppointmentScheduler /> */}
 		</>
 	)
 }

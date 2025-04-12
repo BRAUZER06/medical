@@ -21,7 +21,6 @@ import EmailIcon from '@mui/icons-material/Email'
 import LockIcon from '@mui/icons-material/Lock'
 import LoginIcon from '@mui/icons-material/Login'
 
-
 export default function LoginUser() {
 	const navigate = useNavigate()
 	const queryClient = useQueryClient()
@@ -35,7 +34,6 @@ export default function LoginUser() {
 	const loginMutation = useMutation({
 		mutationFn: async () => loginUser(formData),
 		onSuccess: data => {
-			localStorage.setItem('token', data.token) // Сохраняем токен
 			queryClient.invalidateQueries(['user']) // Обновляем кэш юзера
 			navigate('/profile') // Редирект на профиль
 		},
@@ -81,10 +79,10 @@ export default function LoginUser() {
 				>
 					<Box sx={{ textAlign: 'center', mb: 3 }}>
 						<LoginIcon sx={{ fontSize: 40, color: 'primary.main', mb: 1 }} />
-						<Typography variant="h5" fontWeight="bold">
+						<Typography variant='h5' fontWeight='bold'>
 							Добро пожаловать
 						</Typography>
-						<Typography variant="body2" color="text.secondary">
+						<Typography variant='body2' color='text.secondary'>
 							Введите данные для входа
 						</Typography>
 					</Box>
@@ -92,51 +90,51 @@ export default function LoginUser() {
 					<form onSubmit={handleSubmit} noValidate>
 						<Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
 							<TextField
-								label="Email"
-								name="email"
-								type="email"
+								label='Email'
+								name='email'
+								type='email'
 								value={formData.email}
 								onChange={handleInputChange}
 								fullWidth
 								required
-								autoComplete="email"
+								autoComplete='email'
 								InputProps={{
 									startAdornment: (
-										<InputAdornment position="start">
-											<EmailIcon color="action" />
+										<InputAdornment position='start'>
+											<EmailIcon color='action' />
 										</InputAdornment>
 									),
 								}}
 							/>
 
 							<TextField
-								label="Пароль"
-								name="password"
-								type="password"
+								label='Пароль'
+								name='password'
+								type='password'
 								value={formData.password}
 								onChange={handleInputChange}
 								fullWidth
 								required
-								autoComplete="current-password"
+								autoComplete='current-password'
 								InputProps={{
 									startAdornment: (
-										<InputAdornment position="start">
-											<LockIcon color="action" />
+										<InputAdornment position='start'>
+											<LockIcon color='action' />
 										</InputAdornment>
 									),
 								}}
 							/>
 
 							{errorMessage && (
-								<Alert severity="error" variant="outlined">
+								<Alert severity='error' variant='outlined'>
 									{errorMessage}
 								</Alert>
 							)}
 
 							<Button
-								type="submit"
-								variant="contained"
-								size="large"
+								type='submit'
+								variant='contained'
+								size='large'
 								fullWidth
 								disabled={loginMutation.isPending}
 								sx={{
@@ -150,7 +148,7 @@ export default function LoginUser() {
 							</Button>
 
 							<Button
-								variant="text"
+								variant='text'
 								onClick={() => navigate('/register')}
 								fullWidth
 								sx={{
