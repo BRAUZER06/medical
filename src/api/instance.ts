@@ -13,16 +13,15 @@ const axiosInstance = axios.create({
 })
 
 axiosInstance.interceptors.request.use(config => {
-	const token = getToken()
-
-	if (!config.headers) {
-		config.headers = {}
-	}
-
+	const token = getToken() // теперь всегда будет актуальный
 	if (token) {
-		config.headers.Authorization = `Bearer ${token}`
+		config.headers = {
+			...config.headers,
+			Authorization: `Bearer ${token}`,
+		}
 	}
 	return config
 })
+
 
 export default axiosInstance

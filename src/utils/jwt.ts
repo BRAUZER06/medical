@@ -1,21 +1,18 @@
 const TOKEN_KEY = 'jwt_token'
 
 export const getToken = (): string | null => {
-	try {
-		return localStorage.getItem(TOKEN_KEY)
-	} catch (error) {
-		console.error('Error getting token from localStorage:', error)
-		return null
-	}
+	const token = localStorage.getItem('jwt_token')
+	console.log('[getToken]', token)
+	return token
 }
 
 export const setToken = (token: string) => {
-	try {
-		localStorage.setItem(TOKEN_KEY, token)
-	} catch (error) {
-		console.error('Error setting token in localStorage:', error)
-	}
+	console.log('[setToken]', token)
+	localStorage.setItem('jwt_token', token)
 }
+
+
+
 
 export const removeToken = () => {
 	try {
