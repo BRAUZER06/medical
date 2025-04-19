@@ -58,54 +58,47 @@ const PatientAppointmentScheduler = () => {
 				dayjs(slot.start).hour() < endHour
 		)
 
-const renderSlots = (title: string, slots: Slot[]) => (
-	<Box sx={{ '&:not(:first-of-type)': { mt: 3 } }}>
-		<Typography variant='h6' sx={{ mb: 1 }}>
-			{title}
-		</Typography>
-		<Box
-			sx={{
-				display: 'flex',
-				flexWrap: 'wrap',
-				gap: '8px', // Используем gap вместо spacing
-				'& .MuiButton-root': {
-					minWidth: '100px',
-					margin: 0, // Убираем возможные margin
-					padding: '6px 8px', // Опционально: можно настроить padding
-				},
-			}}
-		>
-			{slots.map(slot => (
-				<Button
-					key={slot.id}
-					variant='contained'
-					onClick={() => setSelectedSlotId(slot.id)}
-					sx={{
+	const renderSlots = (title: string, slots: Slot[]) => (
+		<Box sx={{ '&:not(:first-of-type)': { mt: 3 } }}>
+			<Typography variant='h6' sx={{ mb: 1 }}>
+				{title}
+			</Typography>
+			<Box
+				sx={{
+					display: 'flex',
+					flexWrap: 'wrap',
+					gap: '8px', // Используем gap вместо spacing
+					'& .MuiButton-root': {
 						minWidth: '100px',
-						backgroundColor:
-							selectedSlotId === slot.id
-								? '#4caf50' 
-								: '#ffeb3b',
-						color: selectedSlotId === slot.id ? '#fff' : '#000', 
-						'&:hover': {
+						margin: 0, // Убираем возможные margin
+						padding: '6px 8px', // Опционально: можно настроить padding
+					},
+				}}
+			>
+				{slots.map(slot => (
+					<Button
+						key={slot.id}
+						variant='contained'
+						onClick={() => setSelectedSlotId(slot.id)}
+						sx={{
+							minWidth: '100px',
 							backgroundColor:
-								selectedSlotId === slot.id
-									? '#388e3c' 
-									: '#fbc02d',
-						},
-						border:
-							selectedSlotId === slot.id
-								? '2px solid #2e7d32' 
-								: 'none',
-					}}
-				>
-					{dayjs(slot.start).format('HH:mm')} -{' '}
-					{dayjs(slot.end).format('HH:mm')}
-				</Button>
-			))}
+								selectedSlotId === slot.id ? '#4caf50' : '#ffeb3b',
+							color: selectedSlotId === slot.id ? '#fff' : '#000',
+							'&:hover': {
+								backgroundColor:
+									selectedSlotId === slot.id ? '#388e3c' : '#fbc02d',
+							},
+							border: selectedSlotId === slot.id ? '2px solid #2e7d32' : 'none',
+						}}
+					>
+						{dayjs(slot.start).format('HH:mm')} -{' '}
+						{dayjs(slot.end).format('HH:mm')}
+					</Button>
+				))}
+			</Box>
 		</Box>
-	</Box>
-)
+	)
 
 	const handleSubmit = async () => {
 		if (!id || !selectedSlotId) {
@@ -123,18 +116,17 @@ const renderSlots = (title: string, slots: Slot[]) => (
 
 		try {
 			await createAppointment(payload)
-		
+
 			setSelectedSlotId(null)
 			setNotes('')
 			fetchSlots() // Обновляем слоты после записи
 		} catch (error) {
 			console.error('Ошибка при записи:', error)
-			
 		}
 	}
 
 	return (
-		<Box >
+		<Box>
 			<Typography variant='h5'>Запись к врачу</Typography>
 
 			<LocalizationProvider dateAdapter={AdapterDayjs}>
@@ -207,7 +199,7 @@ const renderSlots = (title: string, slots: Slot[]) => (
 								mt={1}
 								display='block'
 							>
-								Обратите внимание: врач может быть занят и не ответить сразу.
+								Обратите внимание: врач может быть занят и не ответит сразу.
 							</Typography>
 						</Box>
 					) : (

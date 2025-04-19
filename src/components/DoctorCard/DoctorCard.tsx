@@ -39,8 +39,7 @@ const DoctorCard: React.FC<DoctorCardProps> = ({ doctor }) => {
 	return (
 		<Card
 			component={motion.div}
-			whileHover={{ y: -3 }}
-			whileTap={{ scale: 0.98 }}
+		
 			sx={{
 				borderRadius: 2,
 				backgroundColor: '#fff',

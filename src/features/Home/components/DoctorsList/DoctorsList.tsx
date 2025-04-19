@@ -3,6 +3,7 @@ import { Button, Box, Typography } from '@mui/material'
 import { ArrowForwardIos } from '@mui/icons-material' 
 import styles from './DoctorsList.module.scss' 
 import BigTitle from '../../../../components/BigTitle/BigTitle'
+import { useNavigate } from 'react-router-dom'
 
 
 interface Doctor {
@@ -73,6 +74,8 @@ const doctors: Doctor[] = [
 ]
 
 const DoctorsList: React.FC = () => {
+	const navigate = useNavigate()
+
 	return (
 		<Box className={styles.doctorsList}>
 			<BigTitle title='Перечень врачей' />
@@ -97,17 +100,17 @@ const DoctorsList: React.FC = () => {
 						</div>
 						<ArrowForwardIos
 							className={styles.arrowIcon}
-							onClick={() => (window.location.href = '/doctors')} 
+							onClick={() => navigate('/doctors')} // ✅ замена
 						/>
 					</Box>
 				))}
 			</div>
-		
+
 			<Button
 				variant='contained'
 				color='success'
 				className={styles.showMoreButton}
-				onClick={() => (window.location.href = '/doctors')}
+				onClick={() => navigate('/doctors')} // ✅ замена
 			>
 				Показать еще
 			</Button>

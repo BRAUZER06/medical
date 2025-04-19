@@ -16,7 +16,8 @@ dayjs.extend(utc)
 dayjs.extend(timezone)
 
 export default function DoctorSchedule() {
-	const [selectedDate, setSelectedDate] = useState(dayjs.utc())
+	const [selectedDate, setSelectedDate] = useState(dayjs()) // вместо dayjs.utc()
+
 	const [apiSlots, setApiSlots] = useState([])
 	const [slots, setSlots] = useState([])
 	const [mode, setMode] = useState(null) // 'add' | 'delete' | null
@@ -40,24 +41,27 @@ export default function DoctorSchedule() {
 		const endHour = 24
 		const generated = []
 
+		const tz = 'Europe/Moscow'
+		const localDate = dayjs.tz(date.format('YYYY-MM-DD'), tz)
+
 		for (let hour = startHour; hour < endHour; hour++) {
 			for (let min = 0; min < 60; min += 30) {
-				const slotStart = dayjs
-					.utc(date)
+				const moscowTime = localDate
 					.hour(hour)
 					.minute(min)
 					.second(0)
 					.millisecond(0)
-				const slotEnd = slotStart.add(30, 'minute')
+				const utcSlotStart = moscowTime.utc()
+				const utcSlotEnd = utcSlotStart.add(30, 'minute')
 
 				const existing = apiData.find(apiSlot =>
-					dayjs.utc(apiSlot.start).isSame(slotStart)
+					dayjs.utc(apiSlot.start).isSame(utcSlotStart)
 				)
 
 				generated.push({
-					id: existing ? existing.id : `${slotStart.toISOString()}`,
-					start: slotStart.toISOString(),
-					end: slotEnd.toISOString(),
+					id: existing ? existing.id : `${utcSlotStart.toISOString()}`,
+					start: utcSlotStart.toISOString(),
+					end: utcSlotEnd.toISOString(),
 					booked: existing ? existing.booked : false,
 					booking: existing ? existing.booking : null,
 					selected: existing ? true : false,
@@ -65,8 +69,10 @@ export default function DoctorSchedule() {
 				})
 			}
 		}
+
 		setSlots(generated)
 	}
+
 
 	const handleToggleSlot = slotId => {
 		setSlots(prev =>
@@ -83,19 +89,22 @@ export default function DoctorSchedule() {
 		)
 	}
 
-	const getSlotsByPeriod = (periodStart, periodEnd) => {
-		return slots.filter(slot => {
-			const start = dayjs.utc(slot.start)
-			return (
-				start.isSame(selectedDate, 'day') &&
-				start.hour() >= periodStart &&
-				start.hour() < periodEnd
-			)
-		})
-	}
+const getSlotsByPeriod = (periodStart, periodEnd) => {
+	return slots.filter(slot => {
+		const start = dayjs.utc(slot.start).local() // 👈 фикс
+		return (
+			start.isSame(selectedDate, 'day') &&
+			start.hour() >= periodStart &&
+			start.hour() < periodEnd
+		)
+	})
+}
+
 
 	const renderSlot = slot => {
-		const startTime = dayjs.utc(slot.start).format('HH:mm')
+		const startTime = dayjs.utc(slot.start).local().format('HH:mm')
+const localTime = dayjs.utc(slot.start).local().format('HH:mm')
+const utcTime = dayjs.utc(slot.start).format('HH:mm')
 		const isBooked = slot.booked
 		const isSelected = slot.selected
 
@@ -104,12 +113,7 @@ export default function DoctorSchedule() {
 		if (mode === 'delete') disabled = !slot.isFromApi || isBooked
 
 		return (
-			<Tooltip
-				key={slot.id}
-				title={isBooked && slot.booking ? slot.booking.comment : ''}
-				arrow
-				placement='top'
-			>
+			<Tooltip key={slot.id} title={`UTC: ${utcTime}`} arrow placement='top'>
 				<Box
 					sx={{
 						p: 1,
@@ -133,7 +137,7 @@ export default function DoctorSchedule() {
 					}}
 					onClick={() => !disabled && handleToggleSlot(slot.id)}
 				>
-					{startTime}
+					{localTime}
 				</Box>
 			</Tooltip>
 		)
@@ -172,11 +176,10 @@ export default function DoctorSchedule() {
 		}
 	}
 
-	const handleDateChange = newDate => {
-		const updatedDate = newDate.utc()
-		setSelectedDate(updatedDate)
-		generateFullDaySlots(updatedDate, apiSlots)
-	}
+const handleDateChange = newDate => {
+	setSelectedDate(newDate) // ← без .utc()!
+	generateFullDaySlots(newDate, apiSlots)
+}
 
 	return (
 		<LocalizationProvider dateAdapter={AdapterDayjs}>
@@ -188,7 +191,6 @@ export default function DoctorSchedule() {
 					alignItems: 'center',
 					maxWidth: '600px',
 					margin: '0 auto',
-					
 				}}
 			>
 				<DateCalendar
