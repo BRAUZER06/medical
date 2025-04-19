@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import {
 	Box,
 	Typography,
@@ -10,12 +10,12 @@ import {
 	Divider,
 	IconButton,
 	Button,
+	ClickAwayListener,
 } from '@mui/material'
-import { ArrowForwardIos } from '@mui/icons-material'
+import { ArrowForwardIos, Close } from '@mui/icons-material'
 import { useNavigate } from 'react-router-dom'
 
 const mockChats = [
-	// ... те же 10 чатов, без изменений
 	{
 		id: 1,
 		name: 'Гастроэнтеролог Анна',
@@ -23,6 +23,7 @@ const mockChats = [
 		avatar:
 			'https://avatars.mds.yandex.net/get-med/117703/20180206_telemed_taxonomy_icon_square_large_gastroenterologist_1.0/orig',
 	},
+	// остальные врачи без изменений...
 	{
 		id: 2,
 		name: 'Кардиолог Иван',
@@ -88,8 +89,9 @@ const mockChats = [
 	},
 ]
 
-export default function Chat() {
+export default function Chats() {
 	const navigate = useNavigate()
+	const [showModal, setShowModal] = useState(true)
 
 	return (
 		<Box
@@ -109,13 +111,16 @@ export default function Chat() {
 					<React.Fragment key={chat.id}>
 						<ListItem
 							secondaryAction={
-								<IconButton edge='end' disabled>
+								<IconButton
+									edge='end'
+									onClick={() => navigate(`../${chat.id}`)}
+								>
 									<ArrowForwardIos fontSize='small' />
 								</IconButton>
 							}
 							disablePadding
 						>
-							<ListItem button disabled>
+							<ListItem button onClick={() => navigate(`../chats/${chat.id}`)}>
 								<ListItemAvatar>
 									<Avatar src={chat.avatar} alt={chat.name} />
 								</ListItemAvatar>
@@ -130,43 +135,72 @@ export default function Chat() {
 				))}
 			</List>
 
-			{/* Информационное оверлей-окно по центру */}
-			<Box
-				sx={{
-					position: 'fixed',
-					top: '50%',
-					left: '50%',
-					transform: 'translate(-50%, -50%)',
-					bgcolor: 'background.paper',
-					boxShadow: 6,
-					p: 4,
-					borderRadius: 4,
-					textAlign: 'center',
-					maxWidth: 400,
-					width: '90%',
-					zIndex: 1000,
-				}}
-			>
-				<Box sx={{ mb: 2 }}>
-					<img
-						src='https://cdn-icons-png.flaticon.com/512/5957/5957231.png'
-						alt='in progress'
-						width={64}
-						height={64}
-						style={{ margin: '0 auto' }}
-					/>
+			{/* Модалка */}
+			{showModal && (
+				<Box
+					sx={{
+						position: 'fixed',
+						top: 0,
+						left: 0,
+						width: '100vw',
+						height: '100vh',
+						zIndex: 1000,
+						display: 'flex',
+						alignItems: 'center',
+						justifyContent: 'center',
+						backgroundColor: 'rgba(0, 0, 0, 0.15)',
+					}}
+				>
+					<ClickAwayListener onClickAway={() => setShowModal(false)}>
+						<Box
+							sx={{
+								bgcolor: 'background.paper',
+								boxShadow: 4,
+								p: 3,
+								borderRadius: 3,
+								textAlign: 'center',
+								maxWidth: 320,
+								width: '90%',
+								position: 'relative',
+							}}
+						>
+							<IconButton
+								size='small'
+								sx={{ position: 'absolute', top: 8, right: 8 }}
+								onClick={() => setShowModal(false)}
+							>
+								<Close />
+							</IconButton>
+
+							<Box sx={{ mb: 1 }}>
+								<img
+									src='https://cdn-icons-png.flaticon.com/512/5957/5957231.png'
+									alt='in progress'
+									width={48}
+									height={48}
+									style={{ margin: '0 auto' }}
+								/>
+							</Box>
+							<Typography variant='subtitle1' sx={{ fontWeight: 600, mb: 1 }}>
+								Страница в разработке
+							</Typography>
+							<Typography
+								variant='body2'
+								sx={{ color: 'text.secondary', mb: 2 }}
+							>
+								Раздел пока недоступен. Мы готовим полноценный чат с врачами.
+							</Typography>
+							<Button
+								variant='contained'
+								size='medium'
+								onClick={() => navigate(-1)}
+							>
+								Назад
+							</Button>
+						</Box>
+					</ClickAwayListener>
 				</Box>
-				<Typography variant='h6' sx={{ fontWeight: 600, mb: 1 }}>
-					Страница находится в разработке
-				</Typography>
-				<Typography variant='body2' sx={{ color: 'text.secondary', mb: 3 }}>
-					Данный раздел временно недоступен. Мы активно работаем над запуском
-					полноценного чата с врачами.
-				</Typography>
-				<Button variant='contained' size='large' onClick={() => navigate(-1)}>
-					Назад
-				</Button>
-			</Box>
+			)}
 		</Box>
 	)
 }

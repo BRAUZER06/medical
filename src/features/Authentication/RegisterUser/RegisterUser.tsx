@@ -98,7 +98,7 @@ export default function RegisterUser() {
 			queryClient.invalidateQueries(['user'])
 
 			setSuccessMessage('Регистрация и вход выполнены успешно!')
-			navigate('/user/profile')
+			navigate('/profile')
 		},
 		onError: (error: any) => {
 			setErrorMessage(error.response?.data?.message || 'Ошибка регистрации')

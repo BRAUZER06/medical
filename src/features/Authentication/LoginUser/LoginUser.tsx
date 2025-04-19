@@ -34,8 +34,8 @@ export default function LoginUser() {
 	const loginMutation = useMutation({
 		mutationFn: async () => loginUser(formData),
 		onSuccess: data => {
-			queryClient.invalidateQueries(['user']) // Обновляем кэш юзера
-			navigate('/profile') // Редирект на профиль
+			queryClient.invalidateQueries(['user']) 
+			// navigate('/profile') 
 		},
 		onError: (error: any) => {
 			setErrorMessage(error.response?.data?.message || 'Ошибка входа')

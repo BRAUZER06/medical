@@ -11,7 +11,8 @@ import PatientAppointmentScheduler from '../components/PatientAppointmentSchedul
 import DoctorsList from '../components/DoctorsList/DoctorsList'
 import DoctorDetails from '../components/DoctorDetails/DoctorDetails'
 import DoctorSchedule from '../components/WorkSchedulePicker/DoctorSchedule'
-import Chat from './Chats/Chat'
+import Chats from './Chats/Chats'
+import Chat from './Chat/Chat'
 
 
 
@@ -32,7 +33,8 @@ const AppRouter = () => (
 					<Route path='/doctors' element={<DoctorsList />} />
 					<Route path='/doctors/:id' element={<DoctorDetails />} />
 
-					<Route path='/chats' element={<Chat />} />
+					<Route path='/chats' element={<Chats />} />
+					<Route path='/chats/:id' element={<Chat />} />
 					{/* Новый маршрут для записи к врачу */}
 
 					{/* <Route
