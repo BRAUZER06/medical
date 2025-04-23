@@ -5,8 +5,7 @@
 	"type": "module",
 	"scripts": {
 		"dev": "vite",
-		
-		 "build": "vite build",
+		"build": "vite build",
 		"lint": "eslint .",
 		"preview": "vite preview"
 	},
@@ -22,6 +21,7 @@
 		"@mui/lab": "^6.0.0-beta.29",
 		"@mui/material": "^6.4.8",
 		"@mui/x-date-pickers": "^7.27.1",
+		"@rails/actioncable": "^8.0.200",
 		"@reduxjs/toolkit": "^2.5.0",
 		"@tanstack/react-query": "^5.64.1",
 		"axios": "^1.7.9",
