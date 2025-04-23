@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import {
 	Box,
 	Typography,
@@ -6,84 +6,93 @@ import {
 	TextField,
 	Button,
 	Avatar,
+	CircularProgress,
 } from '@mui/material'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
+import { getChatMessage, createMessage, getAllChats } from '../../api/chats'
+import { createConsumer } from '@rails/actioncable'
+import { useQuery } from '@tanstack/react-query'
+import dayjs from 'dayjs'
+import 'dayjs/locale/ru'
 
-const messages = [
-	{
-		id: 1,
-		from: 'doctor',
-		text: 'Здравствуйте! Чем могу помочь?',
-	},
-	{
-		id: 2,
-		from: 'user',
-		text: 'Здравствуйте, у меня болит живот уже 2 дня...',
-	},
-	{
-		id: 3,
-		from: 'doctor',
-		text: 'Понимаю. Были ли у вас симптомы температуры или тошнота?',
-	},
-	{
-		id: 4,
-		from: 'user',
-		text: 'Температуры не было, но вчера была лёгкая тошнота.',
-	},
-	{
-		id: 5,
-		from: 'doctor',
-		text: 'Спасибо. Что вы ели в последний день перед началом боли?',
-	},
-	{
-		id: 6,
-		from: 'user',
-		text: 'Вроде всё обычное... курица, салат, хлеб. Запил соком.',
-	},
-	{
-		id: 7,
-		from: 'doctor',
-		text: 'Хорошо. Боль локализована в одной части живота или размыта?',
-	},
-	{
-		id: 8,
-		from: 'user',
-		text: 'Скорее слева, но иногда ощущается и в центре.',
-	},
-	{
-		id: 9,
-		from: 'doctor',
-		text: 'Понятно. На всякий случай рекомендую сдать общий анализ крови и УЗИ.',
-	},
-	{
-		id: 10,
-		from: 'user',
-		text: 'Спасибо большое! Постараюсь завтра записаться.',
-	},
-	{
-		id: 11,
-		from: 'doctor',
-		text: 'Хорошо. Если состояние ухудшится — немедленно обратитесь очно.',
-	},
-	{
-		id: 12,
-		from: 'user',
-		text: 'Поняла, спасибо! Хорошего дня.',
-	},
-	{
-		id: 13,
-		from: 'doctor',
-		text: 'И вам здоровья. Берегите себя!',
-	},
-]
+dayjs.locale('ru')
 
+// 👤 Текущий пользователь (заглушка, заменить на auth)
+const currentUser = {
+	id: 37,
+	role: 'patient',
+}
+
+// WebSocket
+const cable = createConsumer('wss://bc83-45-153-24-10.ngrok-free.app/cable')
+
+const subscribeToChat = (chatId: number, onReceived: (data: any) => void) => {
+	return cable.subscriptions.create(
+		{ channel: 'ChatChannel', chat_id: chatId },
+		{
+			connected() {
+				console.log(`✅ Подключено к WebSocket чата #${chatId}`)
+			},
+			disconnected() {
+				console.log(`❌ Отключено от WebSocket чата #${chatId}`)
+			},
+			received(data: any) {
+				console.log('📨 Новое сообщение через WebSocket:', data)
+				onReceived(data)
+			},
+		}
+	)
+}
 
 export default function Chat() {
 	const navigate = useNavigate()
+	const { id: chatIdParam } = useParams()
+	const chatId = Number(chatIdParam)
+
+	const [messages, setMessages] = useState<any[]>([])
+	const [newMessage, setNewMessage] = useState('')
+	const subscriptionRef = useRef<any>(null)
+	const scrollRef = useRef<HTMLDivElement>(null)
+
+	// Получаем список чатов
+	const { data: chats, isLoading: isChatsLoading } = useQuery({
+		queryKey: ['chats'],
+		queryFn: getAllChats,
+		enabled: !!chatId,
+	})
+
+	// Ищем собеседника по chatId
+	const chatPartner = chats?.find(chat => chat.id === chatId)?.user
+
+	useEffect(() => {
+		if (!chatId) return
+
+		getChatMessage(chatId).then(data => {
+			setMessages(data)
+		})
+
+		subscriptionRef.current = subscribeToChat(chatId, data => {
+			setMessages(prev => [...prev, data])
+		})
+
+		return () => {
+			subscriptionRef.current?.unsubscribe()
+		}
+	}, [chatId])
+
+	useEffect(() => {
+		scrollRef.current?.scrollIntoView({ behavior: 'smooth' })
+	}, [messages])
+
+	const handleSend = async () => {
+		if (!newMessage.trim() || !chatId) return
+		await createMessage(chatId, newMessage)
+		setNewMessage('')
+	}
 
 	return (
-		<Box sx={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
+		<Box sx={{ height: '91vh', display: 'flex', flexDirection: 'column' }}>
 			{/* Верхняя панель */}
 			<Box
 				sx={{
@@ -93,17 +102,36 @@ export default function Chat() {
 					py: 1,
 					borderBottom: '1px solid #ccc',
 					backgroundColor: '#f9f9f9',
+					flexShrink: 0,
 				}}
 			>
 				<IconButton onClick={() => navigate(-1)}>
 					<ArrowBackIcon />
 				</IconButton>
-				<Avatar
-					src='https://avatars.mds.yandex.net/get-med/117703/20180206_telemed_taxonomy_icon_square_large_gastroenterologist_1.0/orig'
-					sx={{ mx: 1 }}
-				/>
+				<Avatar sx={{ mx: 1 }} />
 				<Typography variant='h6' noWrap>
-					Гастроэнтеролог Анна
+					{isChatsLoading ? (
+						<CircularProgress size={18} />
+					) : chatPartner ? (
+						<>
+							{chatPartner.first_name} {chatPartner.last_name}
+							{chatPartner.specialization && (
+								<Typography
+									variant='caption'
+									component='span'
+									sx={{
+										display: 'block',
+										fontWeight: 400,
+										fontSize: '0.75rem',
+									}}
+								>
+									{chatPartner.specialization}
+								</Typography>
+							)}
+						</>
+					) : (
+						'Чат'
+					)}
 				</Typography>
 			</Box>
 
@@ -119,41 +147,82 @@ export default function Chat() {
 					backgroundColor: '#f5f5f5',
 				}}
 			>
-				{messages.map(msg => (
-					<Box
-						key={msg.id}
-						sx={{
-							alignSelf: msg.from === 'user' ? 'flex-end' : 'flex-start',
-							backgroundColor: msg.from === 'user' ? '#1976d2' : '#e0e0e0',
-							color: msg.from === 'user' ? 'white' : 'black',
-							px: 2,
-							py: 1,
-							borderRadius: 2,
-							maxWidth: '80%',
-						}}
-					>
-						{msg.text}
-					</Box>
-				))}
+				{messages.map(msg => {
+					const isCurrentUser = msg.sender?.id === currentUser.id
+
+					return (
+						<Box
+							key={msg.id}
+							sx={{
+								alignSelf: isCurrentUser ? 'flex-end' : 'flex-start',
+								backgroundColor: isCurrentUser ? '#1976d2' : '#e0e0e0',
+								color: isCurrentUser ? 'white' : 'black',
+								px: 2,
+								py: 1,
+								borderRadius: 2,
+								maxWidth: '80%',
+								whiteSpace: 'pre-wrap',
+							}}
+						>
+							<Typography variant='body2' sx={{ wordBreak: 'break-word' }}>
+								{msg.content}
+							</Typography>
+							<Typography
+								variant='caption'
+								sx={{
+									display: 'block',
+									textAlign: isCurrentUser ? 'right' : 'left',
+									mt: 0.5,
+									opacity: 0.7,
+								}}
+							>
+								{dayjs(msg.created_at).format('HH:mm · DD MMM')}
+							</Typography>
+						</Box>
+					)
+				})}
+				<div ref={scrollRef} />
 			</Box>
 
-			{/* Поле ввода */}
+			{/* Ввод */}
 			<Box
 				sx={{
 					p: 2,
 					borderTop: '1px solid #ccc',
 					backgroundColor: 'white',
 					display: 'flex',
+					alignItems: 'center',
 					gap: 1,
+					flexShrink: 0,
 				}}
 			>
 				<TextField
 					placeholder='Напишите сообщение...'
 					fullWidth
+					variant='outlined'
 					size='small'
-					disabled
+					value={newMessage}
+					onChange={e => setNewMessage(e.target.value)}
+					sx={{
+						'& .MuiOutlinedInput-root': {
+							borderRadius: 3,
+							backgroundColor: '#f1f1f1',
+							px: 1.5,
+							py: 1,
+						},
+					}}
 				/>
-				<Button variant='contained' disabled>
+				<Button
+					variant='contained'
+					onClick={handleSend}
+					disabled={!newMessage.trim()}
+					sx={{
+						borderRadius: 3,
+						textTransform: 'none',
+						px: 3,
+						height: '100%',
+					}}
+				>
 					Отправить
 				</Button>
 			</Box>

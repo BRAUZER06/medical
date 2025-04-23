@@ -63,23 +63,22 @@ const BottomNav = () => {
 	)
 
 	return (
-		<Box sx={{ pb: 7 }}>
-			<Paper
-				sx={{
-					position: 'fixed',
-					bottom: 0,
-					left: 0,
-					right: 0,
-					zIndex: 1000,
-					background: theme => alpha(theme.palette.background.paper, 0.8),
-					backdropFilter: 'blur(10px)',
-					borderTop: '1px solid',
-					borderColor: 'divider',
-					maxWidth: 600,
-					mx: 'auto',
-				}}
-				elevation={0}
-			>
+		<Box
+			sx={{
+				position: 'fixed',
+				bottom: 0,
+				left: 0,
+				right: 0,
+				zIndex: 1000,
+				background: theme => alpha(theme.palette.background.paper, 0.8),
+				backdropFilter: 'blur(10px)',
+				borderTop: '1px solid',
+				borderColor: 'divider',
+				maxWidth: 600,
+				mx: 'auto',
+			}}
+		>
+			<Paper elevation={0}>
 				<BottomNavigation
 					value={activeTab}
 					showLabels

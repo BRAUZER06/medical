@@ -2,7 +2,6 @@ const TOKEN_KEY = 'jwt_token'
 
 export const getToken = (): string | null => {
 	const token = localStorage.getItem('jwt_token')
-	console.log('[getToken]', token)
 	return token
 }
 

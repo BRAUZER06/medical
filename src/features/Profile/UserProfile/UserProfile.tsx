@@ -33,6 +33,7 @@ import {
 	getPatientRecord,
 	updatePatientRecord,
 } from '../../../api/pacoent'
+import { createOrFetchChat } from '../../../api/chats'
 
 export default function UserProfile() {
 	const queryClient = useQueryClient()
@@ -130,7 +131,16 @@ export default function UserProfile() {
 		setUser(prevUser => ({ ...prevUser, [name]: value }))
 	}
 
-	console.log('appointments', appointments)
+
+
+const handleStartChat = async (userId: number) => {
+	try {
+		const chat = await createOrFetchChat(userId)
+		navigate(`/chats/${chat.id}`)
+	} catch (error) {
+		console.error('Не удалось открыть чат:', error)
+	}
+}
 
 	// Сохранение изменений
 	const handleSave = async () => {
@@ -366,7 +376,7 @@ export default function UserProfile() {
 				{/* Поля для пациента */}
 
 				{/* Блок записей к врачу */}
-				<Paper sx={{ boxShadow: 'none', marginBottom:3 }}>
+				<Paper sx={{ boxShadow: 'none', marginBottom: 3 }}>
 					<Typography variant='h6' gutterBottom>
 						Мои записи к врачу:
 					</Typography>
@@ -418,6 +428,19 @@ export default function UserProfile() {
 											flexDirection: { xs: 'column', sm: 'row' },
 										}}
 									>
+										<Button
+											variant='contained'
+											color={'primary'}
+											size='small'
+											fullWidth={{ xs: true, sm: false }}
+											onClick={() => handleStartChat(appointment?.doctor?.id)}
+											sx={{
+												minWidth: { xs: 'unset', sm: '100px' },
+												whiteSpace: 'nowrap',
+											}}
+										>
+											Открыть Чат
+										</Button>
 										<Button
 											variant='contained'
 											color={'primary'}

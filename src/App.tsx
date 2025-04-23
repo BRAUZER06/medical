@@ -47,7 +47,6 @@ const theme = createTheme({
 const App = () => {
 			const token = getToken()
 
-			console.log('token', token)
 			
 	const queryClient = new QueryClient()
 	
