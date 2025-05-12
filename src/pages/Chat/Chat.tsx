@@ -8,24 +8,25 @@ import {
 	Avatar,
 	CircularProgress,
 } from '@mui/material'
+import AttachFileIcon from '@mui/icons-material/AttachFile'
+import CloseIcon from '@mui/icons-material/Close'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 import { useNavigate, useParams } from 'react-router-dom'
 import { getChatMessage, createMessage, getAllChats } from '../../api/chats'
+import { fetchCurrentUser, User } from '../../api/profile'
 import { createConsumer } from '@rails/actioncable'
 import { useQuery } from '@tanstack/react-query'
 import dayjs from 'dayjs'
 import 'dayjs/locale/ru'
+import { getFileIcon, getFileType } from '../../utils/getFileIcon'
+import { getFullUrl } from '../../utils/getFullUrl'
+import { getAbsoluteUrl } from '../../utils/getAbsoluteUrl'
 
 dayjs.locale('ru')
 
-// 👤 Текущий пользователь (заглушка, заменить на auth)
-const currentUser = {
-	id: 37,
-	role: 'patient',
-}
-
-// WebSocket
-const cable = createConsumer('wss://bc83-45-153-24-10.ngrok-free.app/cable')
+const cable = createConsumer(
+	'wss://8f95-2001-41d0-700-4164-00.ngrok-free.app/cable'
+)
 
 const subscribeToChat = (chatId: number, onReceived: (data: any) => void) => {
 	return cable.subscriptions.create(
@@ -52,17 +53,27 @@ export default function Chat() {
 
 	const [messages, setMessages] = useState<any[]>([])
 	const [newMessage, setNewMessage] = useState('')
+	const [attachedFiles, setAttachedFiles] = useState<File[]>([])
+	const [selectedMessageType, setSelectedMessageType] = useState<
+		'text' | 'image' | 'file'
+	>('text')
+
 	const subscriptionRef = useRef<any>(null)
 	const scrollRef = useRef<HTMLDivElement>(null)
 
-	// Получаем список чатов
+	const { data: currentUser, isLoading: isCurrentUserLoading } = useQuery<User>(
+		{
+			queryKey: ['currentUser'],
+			queryFn: fetchCurrentUser,
+		}
+	)
+
 	const { data: chats, isLoading: isChatsLoading } = useQuery({
 		queryKey: ['chats'],
 		queryFn: getAllChats,
 		enabled: !!chatId,
 	})
 
-	// Ищем собеседника по chatId
 	const chatPartner = chats?.find(chat => chat.id === chatId)?.user
 
 	useEffect(() => {
@@ -86,9 +97,67 @@ export default function Chat() {
 	}, [messages])
 
 	const handleSend = async () => {
-		if (!newMessage.trim() || !chatId) return
-		await createMessage(chatId, newMessage)
+		if (!chatId || (!newMessage.trim() && attachedFiles.length === 0)) return
+
+		const formData = new FormData()
+		formData.append(
+			'message_type',
+			attachedFiles.length > 0 ? selectedMessageType : 'text'
+		)
+
+		if (attachedFiles.length > 0) {
+			attachedFiles.forEach(file => {
+				formData.append('attachments[]', file)
+			})
+		}
+
+		if (newMessage.trim()) {
+			formData.append('content', newMessage)
+		}
+
+		await createMessage(chatId, formData)
+
 		setNewMessage('')
+		setAttachedFiles([])
+	}
+
+	const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+		const files = event.target.files
+		if (files && files.length > 0) {
+			const newFiles = Array.from(files)
+			setAttachedFiles(prev => [...prev, ...newFiles])
+			setSelectedMessageType(
+				newFiles.some(file => file.type.startsWith('image/')) ? 'image' : 'file'
+			)
+		}
+	}
+
+	const handleRemoveFile = (index: number) => {
+		setAttachedFiles(prev => prev.filter((_, i) => i !== index))
+	}
+
+	const handleNavigateToProfile = () => {
+		if (!chatPartner) return
+		if (chatPartner.role === 'patient') {
+			navigate(`/patients/${chatPartner.id}`)
+		} else if (chatPartner.role === 'doctor') {
+			navigate(`/doctors/${chatPartner.id}`)
+		}
+	}
+
+	if (isCurrentUserLoading || isChatsLoading) {
+		return (
+			<Box
+				sx={{
+					height: '100vh',
+					display: 'flex',
+					justifyContent: 'center',
+					alignItems: 'center',
+				}}
+			>
+				<CircularProgress />
+			</Box>
+		)
 	}
 
 	return (
@@ -109,30 +178,26 @@ export default function Chat() {
 					<ArrowBackIcon />
 				</IconButton>
 				<Avatar sx={{ mx: 1 }} />
-				<Typography variant='h6' noWrap>
-					{isChatsLoading ? (
-						<CircularProgress size={18} />
-					) : chatPartner ? (
-						<>
-							{chatPartner.first_name} {chatPartner.last_name}
-							{chatPartner.specialization && (
-								<Typography
-									variant='caption'
-									component='span'
-									sx={{
-										display: 'block',
-										fontWeight: 400,
-										fontSize: '0.75rem',
-									}}
-								>
-									{chatPartner.specialization}
-								</Typography>
-							)}
-						</>
-					) : (
-						'Чат'
+				<Box>
+					<Typography
+						variant='h6'
+						noWrap
+						sx={{ cursor: chatPartner ? 'pointer' : 'default' }}
+						onClick={chatPartner ? handleNavigateToProfile : undefined}
+					>
+						{chatPartner
+							? `${chatPartner.first_name} ${chatPartner.last_name}`
+							: 'Чат'}
+					</Typography>
+					{chatPartner?.specialization && (
+						<Typography
+							variant='caption'
+							sx={{ display: 'block', fontWeight: 400, fontSize: '0.75rem' }}
+						>
+							{chatPartner.specialization}
+						</Typography>
 					)}
-				</Typography>
+				</Box>
 			</Box>
 
 			{/* Сообщения */}
@@ -148,11 +213,11 @@ export default function Chat() {
 				}}
 			>
 				{messages.map(msg => {
-					const isCurrentUser = msg.sender?.id === currentUser.id
+					const isCurrentUser = msg.sender?.id === currentUser?.id
 
 					return (
 						<Box
-							key={msg.id}
+							key={msg.id || `${msg.sender?.id}-${msg.created_at}`}
 							sx={{
 								alignSelf: isCurrentUser ? 'flex-end' : 'flex-start',
 								backgroundColor: isCurrentUser ? '#1976d2' : '#e0e0e0',
@@ -164,9 +229,60 @@ export default function Chat() {
 								whiteSpace: 'pre-wrap',
 							}}
 						>
-							<Typography variant='body2' sx={{ wordBreak: 'break-word' }}>
-								{msg.content}
-							</Typography>
+							{msg.message_type === 'text' && (
+								<Typography variant='body2' sx={{ wordBreak: 'break-word' }}>
+									{msg.content}
+								</Typography>
+							)}
+
+							{msg.attachments?.map(att => {
+								const fileExtension = att.name?.split('.').pop()?.toLowerCase()
+								const fileType =
+									att.type ||
+									(fileExtension ? getFileType(fileExtension) : 'file')
+
+								if (fileType === 'image') {
+									return (
+										<Box
+											key={att.url}
+											sx={{ mt: 1, cursor: 'pointer', overflow: 'hidden' }}
+										>
+											<img
+												src={getAbsoluteUrl(att.url)}
+												alt={att.name}
+												style={{
+													maxWidth: '100%',
+													minHeight: '150px',
+													objectFit: 'cover',
+													borderRadius: '8px',
+													backgroundColor: '#f0f0f0',
+												}}
+												onClick={() => window.open(att.url, '_blank')}
+											/>
+
+											<Typography variant='caption' display='block'>
+												{att.name}
+											</Typography>
+										</Box>
+									)
+								}
+
+								return (
+									<Box key={att.url} sx={{ mt: 1 }}>
+										<a
+											href={getAbsoluteUrl(att.url)}
+											target='_blank'
+											rel='noopener noreferrer'
+											style={{ display: 'block', textAlign: 'center' }}
+										>
+											{getFileIcon(fileExtension || '')}
+											<Typography variant='caption' display='block'>
+												{att.name}
+											</Typography>
+										</a>
+									</Box>
+								)
+							})}
 							<Typography
 								variant='caption'
 								sx={{
@@ -181,10 +297,85 @@ export default function Chat() {
 						</Box>
 					)
 				})}
+
 				<div ref={scrollRef} />
 			</Box>
 
-			{/* Ввод */}
+			{/* Прикрепленные файлы */}
+			{attachedFiles.length > 0 && (
+				<Box
+					sx={{
+						p: 1,
+						borderTop: '1px solid #eee',
+						backgroundColor: '#f9f9f9',
+						display: 'flex',
+						flexWrap: 'wrap',
+						gap: 1,
+						overflowX: 'auto',
+						height: '320px',
+					}}
+				>
+					{attachedFiles.map((file, index) => (
+						<Box
+							key={index}
+							sx={{
+								position: 'relative',
+								minWidth: 100,
+								p: 1,
+								border: '1px solid #ddd',
+								borderRadius: 1,
+								backgroundColor: 'white',
+								maxWidth: '80px',
+							}}
+						>
+							{file.type.startsWith('image/') ? (
+								<img
+									src={URL.createObjectURL(file)}
+									alt={file.name}
+									style={{
+										width: '100%',
+										height: 60,
+										objectFit: 'cover',
+										borderRadius: 4,
+									}}
+								/>
+							) : (
+								<Box sx={{ textAlign: 'center' }}>
+									{getFileIcon(file.name.split('.').pop() || '')}
+								</Box>
+							)}
+							<Typography
+								variant='caption'
+								sx={{
+									display: 'block',
+									whiteSpace: 'nowrap',
+									overflow: 'hidden',
+									textOverflow: 'ellipsis',
+									mt: 0.5,
+								}}
+							>
+								{file.name}
+							</Typography>
+							<IconButton
+								size='small'
+								sx={{
+									position: 'absolute',
+									top: -8,
+									right: -8,
+									backgroundColor: 'white',
+									boxShadow: 1,
+									'&:hover': { backgroundColor: '#f5f5f5' },
+								}}
+								onClick={() => handleRemoveFile(index)}
+							>
+								<CloseIcon fontSize='small' />
+							</IconButton>
+						</Box>
+					))}
+				</Box>
+			)}
+
+			{/* Ввод сообщения */}
 			<Box
 				sx={{
 					p: 2,
@@ -196,6 +387,19 @@ export default function Chat() {
 					flexShrink: 0,
 				}}
 			>
+				<input
+					type='file'
+					id='file-input'
+					multiple
+					style={{ display: 'none' }}
+					onChange={handleFileChange}
+				/>
+				<IconButton
+					onClick={() => document.getElementById('file-input')?.click()}
+				>
+					<AttachFileIcon />
+				</IconButton>
+
 				<TextField
 					placeholder='Напишите сообщение...'
 					fullWidth
@@ -212,10 +416,11 @@ export default function Chat() {
 						},
 					}}
 				/>
+
 				<Button
 					variant='contained'
 					onClick={handleSend}
-					disabled={!newMessage.trim()}
+					disabled={!newMessage.trim() && attachedFiles.length === 0}
 					sx={{
 						borderRadius: 3,
 						textTransform: 'none',

@@ -34,24 +34,26 @@ export default function LoginUser() {
 	const loginMutation = useMutation({
 		mutationFn: async () => loginUser(formData),
 		onSuccess: data => {
-			queryClient.invalidateQueries(['user']) 
-			// navigate('/profile') 
+			queryClient.invalidateQueries(['user'])
+			navigate('/profile') 
 		},
 		onError: (error: any) => {
 			setErrorMessage(error.response?.data?.message || 'Ошибка входа')
 		},
 	})
 
+
 	const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const { name, value } = e.target
 		setFormData(prev => ({ ...prev, [name]: value }))
 	}
 
-	const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-		e.preventDefault()
-		setErrorMessage('')
-		loginMutation.mutate()
-	}
+const handleLoginClick = (e: React.FormEvent<HTMLFormElement>) => {
+	e.preventDefault() // Обязательно! Чтобы форма не перезагружала страницу
+	setErrorMessage('')
+	loginMutation.mutate()
+}
+
 
 	return (
 		<Box
@@ -87,7 +89,7 @@ export default function LoginUser() {
 						</Typography>
 					</Box>
 
-					<form onSubmit={handleSubmit} noValidate>
+					<form noValidate onSubmit={handleLoginClick}>
 						<Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
 							<TextField
 								label='Email'

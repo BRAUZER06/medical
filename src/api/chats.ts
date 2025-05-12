@@ -41,19 +41,35 @@ export const getChatMessage = async (chat_id: number): Promise<any> => {
 }
 
 //добавить сообщение в чат 
-export const createMessage = async (
-	chat_id: number,
-	content: string
-): Promise<any> => {
-	try {
-		const response: AxiosResponse<any> = await axiosInstance.post(
-			`/chats/${chat_id}/messages`,
+// исправленный createMessage
+export const createMessage = async (chat_id: number, payload: any): Promise<any> => {
+  try {
+    const response: AxiosResponse<any> = await axiosInstance.post(
+      `/chats/${chat_id}/messages`,
+      payload,
+      {
+        headers: {
+          'Content-Type': 'multipart/form-data', // 👈 обязательно
+        },
+      }
+    )
+    return response.data
+  } catch (error) {
+    console.error('Ошибка при отправке сообщения:', error)
+    throw error
+  }
+}
 
-			{ content: content }
-		)
-		return response.data
-	} catch (error) {
-		console.error('Ошибка при получении списка врачей:', error)
-		throw error
-	}
+
+// отправить картинку
+export const uploadImageMessage = async (chat_id: number, file: File): Promise<any> => {
+  const formData = new FormData()
+  formData.append('message_type', 'image')
+  formData.append('image', file)
+
+  const response = await axiosInstance.post(`/chats/${chat_id}/messages`, formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  })
+
+  return response.data
 }
