@@ -3,8 +3,9 @@ import axios, { AxiosResponse } from 'axios';
 import axiosInstance from './instance'; 
 
 export interface User {
+	workplace?: string
 	id: number
-	avatar_url:string |null
+	avatar_url: string | null
 	email: string
 	created_at: string
 	updated_at: string

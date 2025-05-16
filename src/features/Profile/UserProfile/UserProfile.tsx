@@ -109,6 +109,7 @@ export default function UserProfile() {
 				created_at: userData.created_at,
 				updated_at: userData.updated_at,
 				role: userData.role,
+				workplace: userData.workplace,
 				last_name: userData.last_name,
 				first_name: userData.first_name,
 				middle_name: userData.middle_name,
@@ -131,16 +132,21 @@ export default function UserProfile() {
 		setUser(prevUser => ({ ...prevUser, [name]: value }))
 	}
 
-
-
-const handleStartChat = async (userId: number) => {
-	try {
-		const chat = await createOrFetchChat(userId)
-		navigate(`/chats/${chat.id}`)
-	} catch (error) {
-		console.error('Не удалось открыть чат:', error)
+	const handleInputChangePlaceOfWork = (
+		e: React.ChangeEvent<HTMLInputElement>
+	) => {
+		const { name, value } = e.target
+		setUser(prevUser => ({ ...prevUser, [name]: value }))
 	}
-}
+
+	const handleStartChat = async (userId: number) => {
+		try {
+			const chat = await createOrFetchChat(userId)
+			navigate(`/chats/${chat.id}`)
+		} catch (error) {
+			console.error('Не удалось открыть чат:', error)
+		}
+	}
 
 	// Сохранение изменений
 	const handleSave = async () => {
@@ -160,6 +166,7 @@ const handleStartChat = async (userId: number) => {
 			first_name: user.first_name,
 			middle_name: user.middle_name,
 			phone: user.phone,
+			workplace: user.workplace,
 			date_of_birth: user.date_of_birth,
 			gender: user.gender,
 			specialization: user.specialization,
@@ -202,6 +209,30 @@ const handleStartChat = async (userId: number) => {
 			notes: 'Лечись, гомункул ',
 		},
 	]
+
+	// Функция для преобразования ISO строки в формат "HH:MM - HH:MM"
+	const formatAppointmentTime = (start: string, end: string) => {
+		const startTime = new Date(start).toLocaleTimeString([], {
+			hour: '2-digit',
+			minute: '2-digit',
+		})
+		const endTime = new Date(end).toLocaleTimeString([], {
+			hour: '2-digit',
+			minute: '2-digit',
+		})
+		return `${startTime} - ${endTime}`
+	}
+	const sortedAppointments = [...appointments].sort(
+		(a, b) =>
+			new Date(b.start_datetime).getTime() -
+			new Date(a.start_datetime).getTime()
+	)
+
+	const isAppointmentExpired = (appointmentEndTime: string) => {
+		const now = new Date()
+		const endTime = new Date(appointmentEndTime)
+		return now > endTime
+	}
 
 	// Отображение загрузки или ошибки
 	if (isLoading) return <div>Загрузка...</div>
@@ -304,7 +335,7 @@ const handleStartChat = async (userId: number) => {
 									),
 								}}
 							/>
-							<TextField
+							{/* <TextField
 								label='Телефон'
 								name='phone'
 								value={user.phone}
@@ -317,7 +348,7 @@ const handleStartChat = async (userId: number) => {
 										</InputAdornment>
 									),
 								}}
-							/>
+							/> */}
 						</Box>
 					) : (
 						<Box
@@ -359,7 +390,7 @@ const handleStartChat = async (userId: number) => {
 								</Box>
 							</Box>
 
-							<Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+							{/* <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
 								<PhoneIphoneIcon color='action' />
 								<Box>
 									<Typography variant='caption' color='text.secondary'>
@@ -369,7 +400,7 @@ const handleStartChat = async (userId: number) => {
 										{user.phone || 'Не указано'}
 									</Typography>
 								</Box>
-							</Box>
+							</Box> */}
 						</Box>
 					)}
 				</Paper>
@@ -381,157 +412,188 @@ const handleStartChat = async (userId: number) => {
 						Мои записи к врачу:
 					</Typography>
 
-					{appointments.length > 0 ? (
+					{sortedAppointments.length > 0 ? (
 						<Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-							{appointments.map(appointment => (
-								<Paper
-									key={appointment.appointment_id}
-									sx={{
-										p: 2,
-										display: 'flex',
-										flexDirection: 'column',
-										gap: 1,
-										borderLeft: '4px solid',
-										borderColor: 'primary.main',
-									}}
-								>
-									<Box
+							{sortedAppointments.map(appointment => {
+								const isExpired = isAppointmentExpired(appointment.end_datetime)
+								return (
+									<Paper
+										key={appointment.appointment_id}
 										sx={{
+											p: 2,
 											display: 'flex',
-											flexDirection: { xs: 'column', sm: 'row' },
-											justifyContent: 'space-between',
-										}}
-									>
-										<Typography variant='subtitle1'>
-											Доктор: {appointment.doctor.name}
-										</Typography>
-										<Typography variant='body2' color='text.secondary'>
-											{appointment.date}
-										</Typography>
-									</Box>
-
-									<Typography variant='body2'>
-										Время: {appointment.time}
-									</Typography>
-
-									{appointment.notes && (
-										<Typography variant='body2'>
-											Примечание: {appointment.notes}
-										</Typography>
-									)}
-
-									<Box
-										sx={{
-											display: 'flex',
+											flexDirection: 'column',
 											gap: 1,
-											mt: 1,
-											flexDirection: { xs: 'column', sm: 'row' },
+											borderLeft: '4px solid',
+											borderColor: isExpired ? 'error.main' : 'primary.main',
+											opacity: isExpired ? 0.7 : 1,
 										}}
+										elevation={isExpired ? 0 : 2}
 									>
-										<Button
-											variant='contained'
-											color={'primary'}
-											size='small'
-											fullWidth={{ xs: true, sm: false }}
-											onClick={() => handleStartChat(appointment?.doctor?.id)}
-											sx={{
-												minWidth: { xs: 'unset', sm: '100px' },
-												whiteSpace: 'nowrap',
-											}}
-										>
-											Открыть Чат
-										</Button>
-										<Button
-											variant='contained'
-											color={'primary'}
-											size='small'
-											fullWidth={{ xs: true, sm: false }}
-											onClick={() => {
-												setEditingAppointmentId(appointment.appointment_id)
-												setAppointmentNotes(appointment.notes || '')
-											}}
-											sx={{
-												minWidth: { xs: 'unset', sm: '100px' },
-												whiteSpace: 'nowrap',
-											}}
-										>
-											Редактировать
-										</Button>
-										<Button
-											variant='outlined'
-											color='error'
-											size='small'
-											fullWidth={{ xs: true, sm: false }}
-											onClick={async () => {
-												try {
-													await deletedPatientRecord(appointment.appointment_id)
-													await fetchAppointments()
-												} catch (error) {
-													console.error('Ошибка при отмене записи:', error)
-												}
-											}}
-											sx={{
-												minWidth: { xs: 'unset', sm: '100px' },
-												whiteSpace: 'nowrap',
-											}}
-										>
-											Отменить запись
-										</Button>
-									</Box>
-
-									{editingAppointmentId === appointment.appointment_id && (
 										<Box
 											sx={{
 												display: 'flex',
-												gap: 1,
-												mt: 1,
-												alignItems: 'center',
 												flexDirection: { xs: 'column', sm: 'row' },
+												justifyContent: 'space-between',
 											}}
 										>
-											<TextField
-												value={appointmentNotes}
-												onChange={e => setAppointmentNotes(e.target.value)}
-												size='small'
-												fullWidth
-											/>
+											<Typography variant='subtitle1'>
+												Доктор: {appointment.doctor.name}
+												{isExpired && (
+													<Typography
+														variant='caption'
+														color='error'
+														sx={{ ml: 1 }}
+													>
+														(Время приёма прошло)
+													</Typography>
+												)}
+											</Typography>
+											<Typography variant='body2' color='text.secondary'>
+												{appointment.date}
+											</Typography>
+										</Box>
+
+										<Typography variant='body2'>
+											Дата:{' '}
+											{new Date(
+												appointment.start_datetime
+											).toLocaleDateString()}
+										</Typography>
+										<Typography variant='body2'>
+											Время:{' '}
+											{formatAppointmentTime(
+												appointment.start_datetime,
+												appointment.end_datetime
+											)}
+										</Typography>
+
+										{appointment.notes && (
+											<Typography variant='body2'>
+												Примечание: {appointment.notes}
+											</Typography>
+										)}
+
+										{!isExpired && (
 											<Box
 												sx={{
 													display: 'flex',
 													gap: 1,
-													width: { xs: '100%', sm: 'auto' },
+													mt: 1,
+													flexDirection: { xs: 'column', sm: 'row' },
 												}}
 											>
 												<Button
 													variant='contained'
+													color={'primary'}
+													size='small'
 													fullWidth={{ xs: true, sm: false }}
-													onClick={async () => {
-														await updatePatientRecord(
-															appointment.appointment_id,
-															appointmentNotes
-														)
-														setEditingAppointmentId(null)
-														fetchAppointments()
+													onClick={() =>
+														handleStartChat(appointment?.doctor?.id)
+													}
+													sx={{
+														minWidth: { xs: 'unset', sm: '100px' },
+														whiteSpace: 'nowrap',
 													}}
 												>
-													Сохранить
+													Открыть Чат
 												</Button>
 												<Button
-													variant='primary'
+													variant='contained'
+													color={'primary'}
+													size='small'
 													fullWidth={{ xs: true, sm: false }}
-													onClick={() => setEditingAppointmentId(null)}
+													onClick={() => {
+														setEditingAppointmentId(appointment.appointment_id)
+														setAppointmentNotes(appointment.notes || '')
+													}}
+													sx={{
+														minWidth: { xs: 'unset', sm: '100px' },
+														whiteSpace: 'nowrap',
+													}}
 												>
-													Отмена
+													Редактировать
+												</Button>
+												<Button
+													variant='outlined'
+													color='error'
+													size='small'
+													fullWidth={{ xs: true, sm: false }}
+													onClick={async () => {
+														try {
+															await deletedPatientRecord(
+																appointment.appointment_id
+															)
+															await fetchAppointments()
+														} catch (error) {
+															console.error('Ошибка при отмене записи:', error)
+														}
+													}}
+													sx={{
+														minWidth: { xs: 'unset', sm: '100px' },
+														whiteSpace: 'nowrap',
+													}}
+												>
+													Отменить запись
 												</Button>
 											</Box>
-										</Box>
-									)}
-								</Paper>
-							))}
+										)}
+
+										{editingAppointmentId === appointment.appointment_id &&
+											!isExpired && (
+												<Box
+													sx={{
+														display: 'flex',
+														gap: 1,
+														mt: 1,
+														alignItems: 'center',
+														flexDirection: { xs: 'column', sm: 'row' },
+													}}
+												>
+													<TextField
+														value={appointmentNotes}
+														onChange={e => setAppointmentNotes(e.target.value)}
+														size='small'
+														fullWidth
+													/>
+													<Box
+														sx={{
+															display: 'flex',
+															gap: 1,
+															width: { xs: '100%', sm: 'auto' },
+														}}
+													>
+														<Button
+															variant='contained'
+															fullWidth={{ xs: true, sm: false }}
+															onClick={async () => {
+																await updatePatientRecord(
+																	appointment.appointment_id,
+																	appointmentNotes
+																)
+																setEditingAppointmentId(null)
+																fetchAppointments()
+															}}
+														>
+															Сохранить
+														</Button>
+														<Button
+															variant='text'
+															fullWidth={{ xs: true, sm: false }}
+															onClick={() => setEditingAppointmentId(null)}
+														>
+															Отмена
+														</Button>
+													</Box>
+												</Box>
+											)}
+									</Paper>
+								)
+							})}
 						</Box>
 					) : (
 						<Typography variant='body2' color='text.secondary'>
-							У вас нет запланированных записей к врачу
+							У вас нет запланированных записей
 						</Typography>
 					)}
 				</Paper>
@@ -644,6 +706,19 @@ const handleStartChat = async (userId: number) => {
 								sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 1 }}
 							>
 								<TextField
+									label='Место работы'
+									name='workplace'
+									value={user.workplace || ''}
+									onChange={handleInputChange}
+									fullWidth
+									InputProps={{
+										startAdornment: (
+											<WorkIcon sx={{ mr: 1, color: 'action.active' }} />
+										),
+									}}
+								/>
+
+								<TextField
 									label='Дата рождения'
 									name='date_of_birth'
 									value={user.date_of_birth || ''}
@@ -730,6 +805,20 @@ const handleStartChat = async (userId: number) => {
 								sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 1 }}
 							>
 								<Box sx={{ display: 'flex', gap: 1 }}>
+									<WorkIcon
+										sx={{ alignSelf: 'center', color: 'action.active' }}
+									/>
+									<Box>
+										<Typography variant='caption' color='text.secondary'>
+											Место работы
+										</Typography>
+										<Typography variant='body1'>
+											{user.workplace || 'Не указано'}
+										</Typography>
+									</Box>
+								</Box>
+								ата рожден
+								<Box sx={{ display: 'flex', gap: 1 }}>
 									<CalendarMonthIcon
 										sx={{ alignSelf: 'center', color: 'action.active' }}
 									/>
@@ -742,7 +831,6 @@ const handleStartChat = async (userId: number) => {
 										</Typography>
 									</Box>
 								</Box>
-
 								<Box sx={{ display: 'flex', gap: 1 }}>
 									<WcIcon
 										sx={{ alignSelf: 'center', color: 'action.active' }}
@@ -756,7 +844,6 @@ const handleStartChat = async (userId: number) => {
 										</Typography>
 									</Box>
 								</Box>
-
 								<Box sx={{ display: 'flex', gap: 1 }}>
 									<InfoIcon
 										sx={{ alignSelf: 'center', color: 'action.active' }}
@@ -770,7 +857,6 @@ const handleStartChat = async (userId: number) => {
 										</Typography>
 									</Box>
 								</Box>
-
 								<Box sx={{ display: 'flex', gap: 1 }}>
 									<MedicalInformationIcon
 										sx={{ alignSelf: 'center', color: 'action.active' }}
@@ -784,7 +870,6 @@ const handleStartChat = async (userId: number) => {
 										</Typography>
 									</Box>
 								</Box>
-
 								<Box sx={{ display: 'flex', gap: 1 }}>
 									<WorkIcon
 										sx={{ alignSelf: 'center', color: 'action.active' }}

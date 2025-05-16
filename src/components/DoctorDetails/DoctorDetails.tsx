@@ -20,7 +20,6 @@ import { getDoctorById } from '../../api/doctors'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import PatientAppointmentScheduler from '../PatientAppointmentScheduler/PatientAppointmentScheduler'
 
-
 import EmailIcon from '@mui/icons-material/Email'
 import PhoneIcon from '@mui/icons-material/Phone'
 import CakeIcon from '@mui/icons-material/Cake'
@@ -30,7 +29,93 @@ import DescriptionIcon from '@mui/icons-material/Description'
 import InfoIcon from '@mui/icons-material/Info'
 import HealingIcon from '@mui/icons-material/Healing'
 
+// Функция для вычисления возраста с правильным склонением
+const calculateAge = (birthDate: string): string => {
+	if (!birthDate) return 'Не указано'
 
+	const today = new Date()
+	const birthDateObj = new Date(birthDate)
+
+	if (isNaN(birthDateObj.getTime())) return 'Неверная дата'
+
+	let age = today.getFullYear() - birthDateObj.getFullYear()
+	const monthDiff = today.getMonth() - birthDateObj.getMonth()
+
+	if (
+		monthDiff < 0 ||
+		(monthDiff === 0 && today.getDate() < birthDateObj.getDate())
+	) {
+		age--
+	}
+
+	// Склонение слова "год"
+	const lastDigit = age % 10
+	const lastTwoDigits = age % 100
+
+	if (lastTwoDigits >= 11 && lastTwoDigits <= 19) {
+		return `${age} лет`
+	}
+
+	switch (lastDigit) {
+		case 1:
+			return `${age} год`
+		case 2:
+		case 3:
+		case 4:
+			return `${age} года`
+		default:
+			return `${age} лет`
+	}
+}
+
+interface InfoRowProps {
+	label: string
+	value: string | number | null | undefined
+	icon: React.ReactNode
+}
+
+const InfoRow: React.FC<InfoRowProps> = ({ label, value, icon }) => {
+	if (!value) return null
+
+	return (
+		<Box
+			sx={{
+				display: 'flex',
+				alignItems: 'flex-start',
+				gap: 1.5,
+				mb: 2,
+				borderBottom: '1px solid #eee',
+				pb: 1,
+			}}
+		>
+			<Box
+				sx={{
+					mt: 0.5,
+					color: 'primary.main',
+					minWidth: 24,
+					display: 'flex',
+					justifyContent: 'center',
+				}}
+			>
+				{icon}
+			</Box>
+			<Box>
+				<Typography variant='caption' color='text.secondary'>
+					{label}
+				</Typography>
+				<Typography
+					variant='body2'
+					fontWeight={500}
+					sx={{ lineHeight: 1.4, color: 'text.primary' }}
+				>
+					{label === 'Возраст' && typeof value === 'string'
+						? calculateAge(value)
+						: value}
+				</Typography>
+			</Box>
+		</Box>
+	)
+}
 
 const DoctorDetails: React.FC = () => {
 	const { id } = useParams<{ id: string }>()
@@ -68,9 +153,6 @@ const DoctorDetails: React.FC = () => {
 		medical_history,
 		avatar_url,
 	} = doctor.attributes
-
-	console.log('avatar_url', avatar_url)
-	
 
 	return (
 		<Box sx={{ p: '4px', maxWidth: 600, mx: 'auto' }}>
@@ -141,7 +223,7 @@ const DoctorDetails: React.FC = () => {
 						mb: 2,
 						borderRadius: 3,
 						overflow: 'hidden',
-						bgcolor: '#fff', // тело белое — для контраста
+						bgcolor: '#fff',
 						boxShadow: '0 6px 16px rgba(0, 0, 0, 0.06)',
 						'&:before': { display: 'none' },
 					}}
@@ -151,7 +233,7 @@ const DoctorDetails: React.FC = () => {
 							<ExpandMoreIcon sx={{ color: '#fff', fontSize: '1.6rem' }} />
 						}
 						sx={{
-							bgcolor: '#1876d2', // 🔵 твой цвет
+							bgcolor: '#1876d2',
 							px: 2,
 							py: 1.8,
 							'& .MuiAccordionSummary-content': {
@@ -174,14 +256,14 @@ const DoctorDetails: React.FC = () => {
 						<InfoRow icon={<PhoneIcon />} label='Телефон' value={phone} />
 						<InfoRow
 							icon={<CakeIcon />}
-							label='Дата рождения'
+							label='Возраст'
 							value={date_of_birth}
 						/>
 						<InfoRow icon={<WcIcon />} label='Пол' value={gender} />
 						<InfoRow
 							icon={<WorkspacePremiumIcon />}
 							label='Опыт'
-							value={experience}
+							value={experience ? `${experience} лет` : null}
 						/>
 						<InfoRow
 							icon={<DescriptionIcon />}
@@ -247,48 +329,6 @@ const DoctorDetails: React.FC = () => {
 					</AccordionDetails>
 				</Accordion>
 			</Paper>
-		</Box>
-	)
-}
-
-// Компонент для отображения строки информации
-const InfoRow: React.FC<InfoRowProps> = ({ label, value, icon }) => {
-	if (!value) return null
-
-	return (
-		<Box
-			sx={{
-				display: 'flex',
-				alignItems: 'flex-start',
-				gap: 1.5,
-				mb: 2,
-				borderBottom: '1px solid #eee',
-				pb: 1,
-			}}
-		>
-			<Box
-				sx={{
-					mt: 0.5,
-					color: 'primary.main',
-					minWidth: 24,
-					display: 'flex',
-					justifyContent: 'center',
-				}}
-			>
-				{icon}
-			</Box>
-			<Box>
-				<Typography variant="caption" color="text.secondary">
-					{label}
-				</Typography>
-				<Typography
-					variant="body2"
-					fontWeight={500}
-					sx={{ lineHeight: 1.4, color: 'text.primary' }}
-				>
-					{value}
-				</Typography>
-			</Box>
 		</Box>
 	)
 }
