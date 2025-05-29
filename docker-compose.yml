@@ -13,5 +13,5 @@ services:
       - medical_consultations_default
 
 networks:
-  crm_dubai_default:
+  medical_consultations_default:
     driver: bridge
