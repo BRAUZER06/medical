@@ -9,7 +9,11 @@ export default defineConfig({
     host: '0.0.0.0',
     port: 5173,
     strictPort: true,
-    origin: 'http://only-doc.ru:5173',
+    origin: 'https://only-doc.ru',
+    hmr: {
+      clientPort: 443,
+      port: 5173
+    }
   },
 })
 
