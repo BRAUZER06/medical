@@ -6,7 +6,7 @@ export default defineConfig({
   root: '.',
   plugins: [react()],
   server: {
-    host: 'only-doc.ru',
+    host: '0.0.0.0',
     port: 5173,
     strictPort: true,
     origin: 'http://only-doc.ru:5173',
