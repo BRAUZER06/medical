@@ -11,7 +11,8 @@ export default defineConfig({
     origin: 'https://only-doc.ru',
     hmr: {
       clientPort: 443,
-      port: 5173
+      port: 5173,
+      protocol: 'wss'
     },
     fs: {
       allow: ['.']

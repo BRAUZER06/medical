@@ -25,7 +25,7 @@ import { getAbsoluteUrl } from '../../utils/getAbsoluteUrl'
 dayjs.locale('ru')
 
 const cable = createConsumer(
-	'wss://8f95-2001-41d0-700-4164-00.ngrok-free.app/cable'
+	'wss://only-doc.ru/cable'
 )
 
 const subscribeToChat = (chatId: number, onReceived: (data: any) => void) => {
