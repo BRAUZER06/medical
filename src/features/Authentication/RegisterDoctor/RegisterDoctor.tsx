@@ -22,11 +22,12 @@ import LockIcon from '@mui/icons-material/Lock'
 import HowToRegIcon from '@mui/icons-material/HowToReg'
 
 import * as yup from 'yup'
-import styles from './RegisterUser.module.scss'
+import styles from './RegisterDoctor.module.scss'
 import { useNavigate } from 'react-router-dom'
 import { useMutation } from '@tanstack/react-query'
-import { registerUser, loginUser } from '../../../api/auth'
+
 import { useQueryClient } from '@tanstack/react-query'
+import { loginUser } from '../../../api/auth'
 
 // Интерфейс данных формы
 interface FormData {
@@ -62,7 +63,7 @@ const validationSchema = yup.object().shape({
 		.required('Роль обязательна'),
 })
 
-export default function RegisterUser() {
+export default function RegisterDoctor() {
 	const navigate = useNavigate()
 	const queryClient = useQueryClient()
 
@@ -84,7 +85,7 @@ export default function RegisterUser() {
 	// Функции для обработки запросов через React Query
 	const registerMutation = useMutation({
 		mutationFn: async () => {
-			return registerUser(formData)
+			return RegisterDoctor(formData)
 		},
 
 		onSuccess: async () => {
@@ -186,10 +187,10 @@ export default function RegisterUser() {
 				>
 					<Box sx={{ textAlign: 'center', mb: 3 }}>
 						<HowToRegIcon sx={{ fontSize: 40, color: 'primary.main', mb: 1 }} />
-						<Typography variant="h5" fontWeight="bold">
+						<Typography variant='h5' fontWeight='bold'>
 							Регистрация
 						</Typography>
-						<Typography variant="body2" color="text.secondary">
+						<Typography variant='body2' color='text.secondary'>
 							Заполните форму ниже
 						</Typography>
 					</Box>
@@ -197,8 +198,8 @@ export default function RegisterUser() {
 					<form onSubmit={handleSubmit} noValidate>
 						<Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
 							<TextField
-								label="Имя"
-								name="first_name"
+								label='Имя'
+								name='first_name'
 								value={formData.first_name}
 								onChange={handleInputChange}
 								error={!!errors.first_name}
@@ -206,16 +207,16 @@ export default function RegisterUser() {
 								fullWidth
 								InputProps={{
 									startAdornment: (
-										<InputAdornment position="start">
-											<PersonIcon color="action" />
+										<InputAdornment position='start'>
+											<PersonIcon color='action' />
 										</InputAdornment>
 									),
 								}}
 							/>
 
 							<TextField
-								label="Фамилия"
-								name="last_name"
+								label='Фамилия'
+								name='last_name'
 								value={formData.last_name}
 								onChange={handleInputChange}
 								error={!!errors.last_name}
@@ -223,8 +224,8 @@ export default function RegisterUser() {
 								fullWidth
 								InputProps={{
 									startAdornment: (
-										<InputAdornment position="start">
-											<PersonIcon color="action" />
+										<InputAdornment position='start'>
+											<PersonIcon color='action' />
 										</InputAdornment>
 									),
 								}}
@@ -232,15 +233,15 @@ export default function RegisterUser() {
 
 							{hasMiddleName && (
 								<TextField
-									label="Отчество"
-									name="middle_name"
+									label='Отчество'
+									name='middle_name'
 									value={formData.middle_name}
 									onChange={handleInputChange}
 									fullWidth
 									InputProps={{
 										startAdornment: (
-											<InputAdornment position="start">
-												<PersonIcon color="action" />
+											<InputAdornment position='start'>
+												<PersonIcon color='action' />
 											</InputAdornment>
 										),
 									}}
@@ -252,43 +253,38 @@ export default function RegisterUser() {
 									<Checkbox
 										checked={hasMiddleName}
 										onChange={handleCheckboxChange}
-										color="primary"
+										color='primary'
 									/>
 								}
-								label="Добавить отчество (при наличии)"
+								label='Добавить отчество (при наличии)'
 								sx={{ ml: '-8px' }}
 							/>
 
 							<FormControl>
-								<FormLabel component="legend">Роль</FormLabel>
+								<FormLabel component='legend'>Роль</FormLabel>
 								<RadioGroup
 									row
-									name="role"
+									name='role'
 									value={formData.role.toString()}
 									onChange={handleRoleChange}
 								>
 									<FormControlLabel
-										value="0"
+										value='1'
 										control={<Radio />}
-										label="Пациент"
+										label='Доктор'
 									/>
-									{/* <FormControlLabel
-										value="1"
-										control={<Radio />}
-										label="Доктор"
-									/> */}
 								</RadioGroup>
 								{errors.role && (
-									<Typography variant="caption" color="error">
+									<Typography variant='caption' color='error'>
 										{errors.role}
 									</Typography>
 								)}
 							</FormControl>
 
 							<TextField
-								label="Email"
-								name="email"
-								type="email"
+								label='Email'
+								name='email'
+								type='email'
 								value={formData.email}
 								onChange={handleInputChange}
 								error={!!errors.email}
@@ -296,17 +292,17 @@ export default function RegisterUser() {
 								fullWidth
 								InputProps={{
 									startAdornment: (
-										<InputAdornment position="start">
-											<EmailIcon color="action" />
+										<InputAdornment position='start'>
+											<EmailIcon color='action' />
 										</InputAdornment>
 									),
 								}}
 							/>
 
 							<TextField
-								label="Пароль"
-								name="password"
-								type="password"
+								label='Пароль'
+								name='password'
+								type='password'
 								value={formData.password}
 								onChange={handleInputChange}
 								error={!!errors.password}
@@ -314,17 +310,17 @@ export default function RegisterUser() {
 								fullWidth
 								InputProps={{
 									startAdornment: (
-										<InputAdornment position="start">
-											<LockIcon color="action" />
+										<InputAdornment position='start'>
+											<LockIcon color='action' />
 										</InputAdornment>
 									),
 								}}
 							/>
 
 							<TextField
-								label="Подтверждение пароля"
-								name="password_confirmation"
-								type="password"
+								label='Подтверждение пароля'
+								name='password_confirmation'
+								type='password'
 								value={formData.password_confirmation}
 								onChange={handleInputChange}
 								error={!!errors.password_confirmation}
@@ -332,23 +328,23 @@ export default function RegisterUser() {
 								fullWidth
 								InputProps={{
 									startAdornment: (
-										<InputAdornment position="start">
-											<LockIcon color="action" />
+										<InputAdornment position='start'>
+											<LockIcon color='action' />
 										</InputAdornment>
 									),
 								}}
 							/>
 
 							{successMessage && (
-								<Alert severity="success">{successMessage}</Alert>
+								<Alert severity='success'>{successMessage}</Alert>
 							)}
-							{errorMessage && <Alert severity="error">{errorMessage}</Alert>}
+							{errorMessage && <Alert severity='error'>{errorMessage}</Alert>}
 
 							<Button
-								type="submit"
-								variant="contained"
+								type='submit'
+								variant='contained'
 								fullWidth
-								size="large"
+								size='large'
 								disabled={registerMutation.isPending}
 								sx={{
 									fontWeight: 'bold',
@@ -363,9 +359,9 @@ export default function RegisterUser() {
 							</Button>
 
 							<Button
-								variant="text"
+								variant='text'
 								fullWidth
-								color="info"
+								color='info'
 								onClick={() => navigate('/login')}
 								sx={{
 									textTransform: 'none',

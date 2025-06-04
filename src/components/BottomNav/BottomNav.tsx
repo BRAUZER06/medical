@@ -33,7 +33,7 @@ const BottomNav = () => {
 	})
 
 	const navItems: NavItem[] = [
-		{ path: '/', label: 'Главная', icon: <HomeIcon /> },
+		// { path: '/', label: 'Главная', icon: <HomeIcon /> },
 		{ path: '/doctors', label: 'Врачи', icon: <MedicalServicesIcon /> },
 		{ path: '/chats', label: 'Чаты', icon: <ChatIcon /> },
 		{

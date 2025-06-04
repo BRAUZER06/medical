@@ -7,10 +7,17 @@ import {
 	Paper,
 	Button,
 	TextField,
+	Chip,
 } from '@mui/material'
 import styles from './UserProfile.module.scss'
 import PatientHistory from '../../../components/PatientHistory/PatientHistory'
-import { fetchCurrentUser, updateUserProfile, User } from '../../../api/profile'
+import {
+	fetchCurrentUser,
+	SpecializationKey,
+	SPECIALIZATIONS,
+	updateUserProfile,
+	User,
+} from '../../../api/profile'
 import { logout } from '../../Authentication/authSlice'
 import { useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
@@ -22,6 +29,7 @@ import PersonIcon from '@mui/icons-material/Person'
 import PhoneIphoneIcon from '@mui/icons-material/PhoneIphone'
 import BadgeIcon from '@mui/icons-material/Badge'
 import InputAdornment from '@mui/material/InputAdornment'
+import AddIcon from '@mui/icons-material/Add'
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth'
 import WcIcon from '@mui/icons-material/Wc'
 
@@ -34,6 +42,7 @@ import {
 	updatePatientRecord,
 } from '../../../api/pacoent'
 import { createOrFetchChat } from '../../../api/chats'
+import { SpecializationsSelect } from '../../../components/SpecializationsSelect/SpecializationsSelect'
 
 export default function UserProfile() {
 	const queryClient = useQueryClient()
@@ -86,13 +95,14 @@ export default function UserProfile() {
 		created_at: '',
 		updated_at: '',
 		role: '',
+		workplaces: [],
 		last_name: '',
 		first_name: '',
 		middle_name: '',
 		phone: '',
 		date_of_birth: '',
 		gender: '',
-		specialization: '',
+		specializations: [],
 		bio: '',
 		experience: null,
 		description_for_patient: null,
@@ -109,14 +119,14 @@ export default function UserProfile() {
 				created_at: userData.created_at,
 				updated_at: userData.updated_at,
 				role: userData.role,
-				workplace: userData.workplace,
+				workplaces: userData.workplaces || [],
+				specializations: userData.specializations || [],
 				last_name: userData.last_name,
 				first_name: userData.first_name,
 				middle_name: userData.middle_name,
 				phone: userData.phone,
 				date_of_birth: userData.date_of_birth,
 				gender: userData.gender,
-				specialization: userData.specialization,
 				bio: userData.bio,
 				experience: userData.experience,
 				description_for_patient: userData.description_for_patient,
@@ -150,6 +160,8 @@ export default function UserProfile() {
 
 	// Сохранение изменений
 	const handleSave = async () => {
+		console.log('user.specializations :', user.specializations)
+
 		const userData = {
 			// first_name: user.first_name,
 			// last_name: user.last_name,
@@ -166,10 +178,10 @@ export default function UserProfile() {
 			first_name: user.first_name,
 			middle_name: user.middle_name,
 			phone: user.phone,
-			workplace: user.workplace,
+			workplaces: user.workplaces,
+			specializations: user.specializations || [],
 			date_of_birth: user.date_of_birth,
 			gender: user.gender,
-			specialization: user.specialization,
 			bio: user.bio,
 			experience: user.experience,
 			description_for_patient: user.description_for_patient,
@@ -272,16 +284,6 @@ export default function UserProfile() {
 						sx={{ borderRadius: 2, boxShadow: 2, textTransform: 'none' }}
 					>
 						{isEditing ? 'Сохранить' : 'Редактировать'}
-					</Button>
-
-					<Button
-						variant='outlined'
-						color='error'
-						startIcon={<LogoutIcon />}
-						onClick={handleLogout}
-						sx={{ borderRadius: 2, boxShadow: 1, textTransform: 'none' }}
-					>
-						Выйти
 					</Button>
 				</Box>
 				{/* Основная информация */}
@@ -405,11 +407,13 @@ export default function UserProfile() {
 					)}
 				</Paper>
 				{/* Поля для пациента */}
-
 				{/* Блок записей к врачу */}
 				<Paper sx={{ boxShadow: 'none', marginBottom: 3 }}>
 					<Typography variant='h6' gutterBottom>
-						Мои записи к врачу:
+						{user.role === 'patient'
+							? 'Мои записи к врачу'
+							: 'Записи пациентов'}
+						:
 					</Typography>
 
 					{sortedAppointments.length > 0 ? (
@@ -597,7 +601,6 @@ export default function UserProfile() {
 						</Typography>
 					)}
 				</Paper>
-
 				{user.role === 'patient' && (
 					<Paper
 						elevation={1}
@@ -681,7 +684,7 @@ export default function UserProfile() {
 									</Box>
 								</Box>
 
-								<PatientHistory visits={visits} />
+								{/* <PatientHistory visits={visits} /> */}
 							</Box>
 						)}
 					</Paper>
@@ -705,19 +708,60 @@ export default function UserProfile() {
 							<Box
 								sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 1 }}
 							>
-								<TextField
-									label='Место работы'
-									name='workplace'
-									value={user.workplace || ''}
-									onChange={handleInputChange}
-									fullWidth
-									InputProps={{
-										startAdornment: (
-											<WorkIcon sx={{ mr: 1, color: 'action.active' }} />
-										),
-									}}
-								/>
-
+								<Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+									<Typography variant='subtitle2'>Места работы:</Typography>
+									{user.workplaces?.map((workplace, index) => (
+										<Box
+											key={index}
+											sx={{ display: 'flex', gap: 1, alignItems: 'center' }}
+										>
+											<TextField
+												value={workplace}
+												onChange={e => {
+													const newWorkplaces = [...(user.workplaces || [])]
+													newWorkplaces[index] = e.target.value
+													setUser(prev => ({
+														...prev,
+														workplaces: newWorkplaces,
+													}))
+												}}
+												fullWidth
+												InputProps={{
+													startAdornment: (
+														<WorkIcon sx={{ mr: 1, color: 'action.active' }} />
+													),
+												}}
+											/>
+											<Button
+												variant='outlined'
+												color='error'
+												onClick={() => {
+													const newWorkplaces = [...(user.workplaces || [])]
+													newWorkplaces.splice(index, 1)
+													setUser(prev => ({
+														...prev,
+														workplaces: newWorkplaces,
+													}))
+												}}
+											>
+												Удалить
+											</Button>
+										</Box>
+									))}
+									<Button
+										variant='success'
+										onClick={() => {
+											setUser(prev => ({
+												...prev,
+												workplaces: [...(prev.workplaces || []), ''],
+											}))
+										}}
+										startIcon={<AddIcon />}
+									>
+										Добавить место работы
+									</Button>
+								</Box>
+								{/* variant='contained' color={isEditing ? 'success' : 'primary'} */}
 								<TextField
 									label='Дата рождения'
 									name='date_of_birth'
@@ -772,20 +816,22 @@ export default function UserProfile() {
 										),
 									}}
 								/>
-								<TextField
-									label='Специализация'
-									name='specialization'
-									value={user.specialization || ''}
-									onChange={handleInputChange}
-									fullWidth
-									InputProps={{
-										startAdornment: (
-											<MedicalInformationIcon
-												sx={{ mr: 1, color: 'action.active' }}
-											/>
-										),
-									}}
-								/>
+								<Box sx={{ mt: 2 }}>
+									<Typography
+										variant='subtitle2'
+										gutterBottom
+										sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
+									>
+										<MedicalInformationIcon color='action' />
+										<span>Специализации</span>
+									</Typography>
+									<SpecializationsSelect
+										value={user.specializations || []}
+										onChange={specializations =>
+											setUser(prev => ({ ...prev, specializations }))
+										}
+									/>
+								</Box>
 								<TextField
 									label='Опыт работы (лет)'
 									name='experience'
@@ -810,14 +856,22 @@ export default function UserProfile() {
 									/>
 									<Box>
 										<Typography variant='caption' color='text.secondary'>
-											Место работы
+											Места работы
 										</Typography>
-										<Typography variant='body1'>
-											{user.workplace || 'Не указано'}
-										</Typography>
+										{user.workplaces?.length ? (
+											<ul style={{ margin: 0, paddingLeft: 20 }}>
+												{user.workplaces.map((wp, i) => (
+													<li key={i}>
+														<Typography variant='body1'>{wp}</Typography>
+													</li>
+												))}
+											</ul>
+										) : (
+											<Typography variant='body1'>Не указано</Typography>
+										)}
 									</Box>
 								</Box>
-								ата рожден
+								Дата рожденения
 								<Box sx={{ display: 'flex', gap: 1 }}>
 									<CalendarMonthIcon
 										sx={{ alignSelf: 'center', color: 'action.active' }}
@@ -859,15 +913,39 @@ export default function UserProfile() {
 								</Box>
 								<Box sx={{ display: 'flex', gap: 1 }}>
 									<MedicalInformationIcon
-										sx={{ alignSelf: 'center', color: 'action.active' }}
+										sx={{
+											alignSelf: 'flex-start',
+											color: 'action.active',
+											mt: 0.5,
+										}}
 									/>
 									<Box>
 										<Typography variant='caption' color='text.secondary'>
-											Специализация
+											Специализации
 										</Typography>
-										<Typography variant='body1'>
-											{user.specialization || 'Не указано'}
-										</Typography>
+										{user.specializations?.length ? (
+											<Box
+												sx={{
+													display: 'flex',
+													flexWrap: 'wrap',
+													gap: 0.5,
+													mt: 0.5,
+												}}
+											>
+												{user.specializations.map(specKey => (
+													<Chip
+														key={specKey}
+														label={
+															SPECIALIZATIONS[specKey as SpecializationKey] ||
+															specKey
+														}
+														size='small'
+													/>
+												))}
+											</Box>
+										) : (
+											<Typography variant='body1'>Не указано</Typography>
+										)}
 									</Box>
 								</Box>
 								<Box sx={{ display: 'flex', gap: 1 }}>
@@ -886,7 +964,16 @@ export default function UserProfile() {
 							</Box>
 						)}
 					</Paper>
-				)}
+				)}{' '}
+				<Button
+					variant='outlined'
+					color='error'
+					startIcon={<LogoutIcon />}
+					onClick={handleLogout}
+					sx={{ borderRadius: 2, boxShadow: 1, textTransform: 'none' }}
+				>
+					Выйти
+				</Button>
 			</Paper>
 		</Box>
 	)

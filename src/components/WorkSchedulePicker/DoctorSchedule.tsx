@@ -114,7 +114,7 @@ const utcTime = dayjs.utc(slot.start).format('HH:mm')
 
 		return (
 			// <Tooltip key={slot.id} title={`UTC: ${utcTime}`} arrow placement='top'>
-			<div key={slot.id} >
+			<div key={slot.id}>
 				<Box
 					sx={{
 						p: 1,
@@ -126,9 +126,9 @@ const utcTime = dayjs.utc(slot.start).format('HH:mm')
 							? 'primary.main'
 							: 'grey.300',
 						backgroundColor: disabled
-							? 'grey.200'
-							: isSelected
 							? 'primary.light'
+							: isSelected
+							? 'rgb(255 235 59)'
 							: 'white',
 						borderRadius: 2,
 						cursor: disabled ? 'not-allowed' : mode ? 'pointer' : 'default',
@@ -141,7 +141,6 @@ const utcTime = dayjs.utc(slot.start).format('HH:mm')
 					{localTime}
 				</Box>
 			</div>
-		
 		)
 	}
 

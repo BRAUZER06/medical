@@ -1,23 +1,22 @@
-import { defineConfig } from 'vite';
-import react from '@vitejs/plugin-react';
-import svgr from 'vite-plugin-svgr';
-import path from 'path';
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
 
 export default defineConfig({
+  root: '.',
+  plugins: [react()],
   server: {
-    allowedHosts: ['only-doc.ru'],
-    proxy: {
-      '/api': {
-        target: 'https://only-doc.ru/',
-        changeOrigin: true,
-        secure: false,
-      },
+    host: '0.0.0.0',
+    port: 5173,
+    strictPort: true,
+    origin: 'https://only-doc.ru',
+    hmr: {
+      clientPort: 443,
+      port: 5173,
+      protocol: 'wss'
     },
+    fs: {
+      allow: ['.']
+    }
   },
-  plugins: [react(), svgr()],
-  resolve: {
-    alias: {
-      '@': path.resolve(__dirname, 'src'),
-    },
-  },
-});
+})
+

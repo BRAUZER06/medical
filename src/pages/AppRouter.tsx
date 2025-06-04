@@ -13,6 +13,7 @@ import DoctorDetails from '../components/DoctorDetails/DoctorDetails'
 import DoctorSchedule from '../components/WorkSchedulePicker/DoctorSchedule'
 import Chats from './Chats/Chats'
 import Chat from './Chat/Chat'
+import RegisterDoctor from '../features/Authentication/RegisterDoctor/RegisterDoctor'
 
 
 
@@ -22,8 +23,10 @@ const AppRouter = () => (
 			<Routes>
 				{/* Открытые маршруты */}
 				<Route path='/register' element={<RegisterUser />} />
+				<Route path='/registerDoctor' element={<RegisterDoctor />} />
 				<Route path='/login' element={<LoginUser />} />
-				<Route path='/' element={<HomePages />} />
+				<Route path='/' element={<DoctorsList />} />
+				{/* <Route path='/' element={<HomePages />} /> */}
 
 				{/* Защищённые маршруты (видны только после авторизации) */}
 				<Route element={<ProtectedRoute />}>
