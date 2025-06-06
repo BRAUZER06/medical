@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import {
 	Avatar,
@@ -8,6 +8,7 @@ import {
 	Button,
 	TextField,
 	Chip,
+	CircularProgress,
 } from '@mui/material'
 import styles from './UserProfile.module.scss'
 import PatientHistory from '../../../components/PatientHistory/PatientHistory'
@@ -43,6 +44,8 @@ import {
 } from '../../../api/pacoent'
 import { createOrFetchChat } from '../../../api/chats'
 import { SpecializationsSelect } from '../../../components/SpecializationsSelect/SpecializationsSelect'
+import { PhotoProvider, PhotoView } from 'react-photo-view'
+import 'react-photo-view/dist/react-photo-view.css'
 
 export default function UserProfile() {
 	const queryClient = useQueryClient()
@@ -51,6 +54,9 @@ export default function UserProfile() {
 	const [appointments, setAppointments] = useState([])
 	const [editingAppointmentId, setEditingAppointmentId] = useState(null)
 	const [appointmentNotes, setAppointmentNotes] = useState('')
+	const [avatarFile, setAvatarFile] = useState<File | null>(null)
+
+	const fileInputRef = useRef<HTMLInputElement>(null)
 
 	const {
 		data: userData,
@@ -75,6 +81,11 @@ export default function UserProfile() {
 	useEffect(() => {
 		fetchAppointments()
 	}, [])
+
+	const handleAvatarClick = () => {
+		if (!isEditing) return
+		fileInputRef.current?.click()
+	}
 
 	// Мутация для обновления данных пользователя
 	const updateUserMutation = useMutation({
@@ -160,35 +171,40 @@ export default function UserProfile() {
 
 	// Сохранение изменений
 	const handleSave = async () => {
-		console.log('user.specializations :', user.specializations)
+		console.log('user', user)
 
-		const userData = {
-			// first_name: user.first_name,
-			// last_name: user.last_name,
-			// middle_name: user.middle_name,
-			// phone: user.phone,
-			// date_of_birth: user.date_of_birth,
-			// gender: user.gender,
-			// bio: user.bio,
-			// specialization: user.specialization,
+		try {
+			const formData = new FormData()
 
-			id: user.id,
-			email: user.email,
-			last_name: user.last_name,
-			first_name: user.first_name,
-			middle_name: user.middle_name,
-			phone: user.phone,
-			workplaces: user.workplaces,
-			specializations: user.specializations || [],
-			date_of_birth: user.date_of_birth,
-			gender: user.gender,
-			bio: user.bio,
-			experience: user.experience,
-			description_for_patient: user.description_for_patient,
-			medical_history: user.medical_history,
+			if (avatarFile) {
+				formData.append('user[avatar]', avatarFile)
+			}
+
+			formData.append('user[last_name]', user.last_name)
+			formData.append('user[first_name]', user.first_name)
+			formData.append('user[middle_name]', user.middle_name || '')
+			formData.append('user[phone]', user.phone || '')
+			formData.append('user[date_of_birth]', user.date_of_birth || '')
+			formData.append('user[gender]', user.gender || '')
+			formData.append('user[bio]', user.bio || '')
+			formData.append('user[experience]', user.experience?.toString() || '')
+			formData.append(
+				'user[description_for_patient]',
+				user.description_for_patient || ''
+			)
+			formData.append('user[medical_history]', user.medical_history || '')
+			;(user.workplaces || []).forEach(place => {
+				formData.append('user[workplaces][]', place)
+			})
+			;(user.specializations || []).forEach(spec => {
+				formData.append('user[specializations][]', spec)
+			})
+
+			updateUserMutation.mutate(formData)
+			setAvatarFile(null)
+		} catch (error) {
+			console.error('Ошибка при сохранении:', error)
 		}
-
-		updateUserMutation.mutate(userData) // Вызов мутации
 	}
 
 	const toggleEditing = () => {
@@ -252,28 +268,88 @@ export default function UserProfile() {
 	return (
 		<Box className={styles.profileWrapper}>
 			<Paper className={styles.profileCard}>
-				<Box sx={{ display: 'flex', alignItems: 'center', marginBottom: 3 }}>
-					<Avatar
-						src={user.avatar_url || undefined}
-						sx={{ width: 100, height: 100, marginRight: 2, fontSize: 32 }}
-					>
-						{!user.avatar_url && (
-							<>
-								{user.first_name?.[0] || ''}
-								{user.last_name?.[0] || ''}
-							</>
+				<PhotoProvider>
+					<Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
+						{isEditing ? (
+							// В режиме редактирования просто кликаем по input
+							<Box sx={{ position: 'relative', mr: 2 }}>
+								<Avatar
+									src={user.avatar_url || undefined}
+									sx={{
+										width: 100,
+										height: 100,
+										fontSize: 32,
+										cursor: 'pointer',
+										'&:hover': { opacity: 0.8 },
+									}}
+									onClick={() => fileInputRef.current?.click()}
+								>
+									{!user.avatar_url && (
+										<>
+											{user.first_name?.[0] || ''}
+											{user.last_name?.[0] || ''}
+										</>
+									)}
+								</Avatar>
+								<Box
+									sx={{
+										position: 'absolute',
+										bottom: 4,
+										right: 4,
+										backgroundColor: 'rgba(0,0,0,0.6)',
+										color: '#fff',
+										borderRadius: '50%',
+										width: 24,
+										height: 24,
+										fontSize: 14,
+										display: 'flex',
+										alignItems: 'center',
+										justifyContent: 'center',
+									}}
+								>
+									✎
+								</Box>
+							</Box>
+						) : (
+							// В обычном режиме — открытие через react-photo-view
+							<PhotoView src={user.avatar_url}>
+								<Avatar
+									src={user.avatar_url || undefined}
+									sx={{
+										width: 100,
+										height: 100,
+										fontSize: 32,
+										cursor: 'zoom-in',
+										mr: 2,
+									}}
+								>
+									{!user.avatar_url && (
+										<>
+											{user.first_name?.[0] || ''}
+											{user.last_name?.[0] || ''}
+										</>
+									)}
+								</Avatar>
+							</PhotoView>
 						)}
-					</Avatar>
+						<input
+							type='file'
+							ref={fileInputRef}
+							style={{ display: 'none' }}
+							accept='image/*'
+							onChange={e => setAvatarFile(e.target.files?.[0] || null)}
+						/>
 
-					<Box>
-						<Typography variant='h5'>
-							{user.first_name} {user.last_name}
-						</Typography>
-						<Typography variant='subtitle1' color='textSecondary'>
-							Роль: {user.role === 'doctor' ? 'Доктор' : 'Пациент'}
-						</Typography>
+						<Box>
+							<Typography variant='h5'>
+								{user.first_name} {user.last_name}
+							</Typography>
+							<Typography variant='subtitle1' color='textSecondary'>
+								Роль: {user.role === 'doctor' ? 'Доктор' : 'Пациент'}
+							</Typography>
+						</Box>
 					</Box>
-				</Box>
+				</PhotoProvider>
 				{/* Кнопка редактирования */}
 				<Box sx={{ display: 'flex', gap: 2, mb: 3 }}>
 					<Button

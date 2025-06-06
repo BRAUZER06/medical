@@ -28,6 +28,7 @@ import WorkspacePremiumIcon from '@mui/icons-material/WorkspacePremium'
 import DescriptionIcon from '@mui/icons-material/Description'
 import InfoIcon from '@mui/icons-material/Info'
 import HealingIcon from '@mui/icons-material/Healing'
+import { SPECIALIZATIONS } from '../../api/profile'
 
 // Функция для вычисления возраста с правильным склонением
 const calculateAge = (birthDate: string): string => {
@@ -146,12 +147,14 @@ const DoctorDetails: React.FC = () => {
 		phone,
 		date_of_birth,
 		gender,
-		specialization,
+		specializations,
+		workplaces,
 		bio,
 		experience,
 		description_for_patient,
 		medical_history,
 		avatar_url,
+
 	} = doctor.attributes
 
 	return (
@@ -204,14 +207,34 @@ const DoctorDetails: React.FC = () => {
 							{`${first_name ?? ''} ${middle_name ?? ''} ${last_name ?? ''}`}
 						</Typography>
 
-						<Typography
-							variant='body2'
-							color='rgba(255,255,255,0.85)'
-							sx={{ mt: 0.5 }}
-							noWrap
-						>
-							{specialization ?? 'Специализация не указана'}
-						</Typography>
+						{Array.isArray(specializations) && specializations.length > 0 ? (
+							<Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mt: 0.5 }}>
+								{specializations.map(spec => (
+									<Typography
+										key={spec}
+										variant='body2'
+										color='rgba(255,255,255,0.85)'
+										sx={{
+											background: 'rgba(255,255,255,0.15)',
+											px: 1.2,
+											py: 0.2,
+											borderRadius: 1,
+										}}
+									>
+										{SPECIALIZATIONS[spec as keyof typeof SPECIALIZATIONS] ||
+											spec}
+									</Typography>
+								))}
+							</Box>
+						) : (
+							<Typography
+								variant='body2'
+								color='rgba(255,255,255,0.7)'
+								sx={{ mt: 0.5 }}
+							>
+								Специализация не указана
+							</Typography>
+						)}
 					</Box>
 				</Box>
 
@@ -253,7 +276,7 @@ const DoctorDetails: React.FC = () => {
 
 					<AccordionDetails sx={{ px: 2.5, py: 2 }}>
 						<InfoRow icon={<EmailIcon />} label='Email' value={email} />
-						<InfoRow icon={<PhoneIcon />} label='Телефон' value={phone} />
+						{/* <InfoRow icon={<PhoneIcon />} label='Телефон' value={phone} /> */}
 						<InfoRow
 							icon={<CakeIcon />}
 							label='Возраст'
@@ -265,6 +288,37 @@ const DoctorDetails: React.FC = () => {
 							label='Опыт'
 							value={experience ? `${experience} лет` : null}
 						/>
+
+						{Array.isArray(workplaces) && workplaces.length > 0 && (
+							<Box sx={{ mb: 2 }}>
+								<Typography
+									variant='caption'
+									color='text.secondary'
+									sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}
+								>
+									<WorkspacePremiumIcon sx={{ color: 'primary.main' }} />
+									Места работы
+								</Typography>
+
+								<List dense sx={{ pl: 4 }}>
+									{workplaces.map((place, index) => (
+										<ListItem key={index} disableGutters sx={{ pl: 0 }}>
+											<ListItemText
+												primary={
+													<Typography
+														variant='body2'
+														sx={{ color: 'text.primary' }}
+													>
+														{place}
+													</Typography>
+												}
+											/>
+										</ListItem>
+									))}
+								</List>
+							</Box>
+						)}
+
 						<InfoRow
 							icon={<DescriptionIcon />}
 							label='Описание'

@@ -51,23 +51,22 @@ export const fetchCurrentUser = async (): Promise<User> => {
 
 // Обновление данных пользователя
 export const updateUserProfile = async (
-	userData: UserUpdateData
+	userData: UserUpdateData | FormData
 ): Promise<User> => {
 	try {
 		const response: AxiosResponse<{ data: User }> = await axiosInstance.patch(
 			'/current_user',
-			{
-				user: userData,
-			}
+			userData,
+			userData instanceof FormData
+				? { headers: { 'Content-Type': 'multipart/form-data' } }
+				: undefined
 		)
-		return response.data.data // Предполагаем, что сервер возвращает данные вложенными в объект data
+		return response.data.data
 	} catch (error) {
 		console.error('Ошибка при обновлении данных пользователя:', error)
 		throw error
 	}
 }
-
-
 
 
 
