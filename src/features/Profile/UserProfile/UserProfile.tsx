@@ -72,7 +72,16 @@ export default function UserProfile() {
 			const data = await getPatientRecord()
 			console.log('data', data)
 
-			setAppointments(data)
+			const parsed = data.map(appointment => {
+				const [start, end] = appointment.time.split(' - ')
+				return {
+					...appointment,
+					start_datetime: new Date(start),
+					end_datetime: new Date(end),
+				}
+			})
+			setAppointments(parsed)
+			
 		} catch (error) {
 			console.error('Ошибка загрузки записей:', error)
 		}
