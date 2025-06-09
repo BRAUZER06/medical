@@ -5,9 +5,6 @@ import { useNavigate } from 'react-router-dom'
 import { useMutation } from '@tanstack/react-query'
 import { loginUser } from '../../../api/auth'
 import { useQueryClient } from '@tanstack/react-query'
-import { useDispatch } from 'react-redux'
-import { setUser } from '../authSlice'
-import { AppDispatch } from '../../../store'
 import styles from './LoginUser.module.scss'
 
 import {
@@ -27,7 +24,6 @@ import LoginIcon from '@mui/icons-material/Login'
 export default function LoginUser() {
 	const navigate = useNavigate()
 	const queryClient = useQueryClient()
-	const dispatch = useDispatch<AppDispatch>()
 
 	const [formData, setFormData] = useState({
 		email: '',
@@ -37,27 +33,8 @@ export default function LoginUser() {
 
 	const loginMutation = useMutation({
 		mutationFn: async () => loginUser(formData),
-		onSuccess: (data: any) => {
-			// Получаем данные пользователя из ответа
-			const userData = data?.data?.attributes || data?.user || data
-			const token = localStorage.getItem('jwt_token') // токен уже сохранен в loginUser
-			
-			if (token && userData) {
-				// Устанавливаем пользователя в Redux
-				dispatch(setUser({ 
-					user: {
-						id: String(userData.id || ''),
-						email: userData.email || '',
-						role: userData.role === 'doctor' ? 'doctor' : 'patient',
-						firstName: userData.first_name || '',
-						lastName: userData.last_name || '',
-						middleName: userData.middle_name || undefined,
-					},
-					token 
-				}))
-			}
-			
-			queryClient.invalidateQueries({ queryKey: ['user'] })
+		onSuccess: data => {
+			queryClient.invalidateQueries(['user'])
 			navigate('/profile') 
 		},
 		onError: (error: any) => {
