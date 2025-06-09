@@ -25,13 +25,14 @@ const AppRouter = () => (
 				<Route path='/register' element={<RegisterUser />} />
 				<Route path='/registerDoctor' element={<RegisterDoctor />} />
 				<Route path='/login' element={<LoginUser />} />
-				<Route path='/' element={<DoctorsList />} />
+
 				{/* <Route path='/' element={<HomePages />} /> */}
 
 				{/* Защищённые маршруты (видны только после авторизации) */}
 				<Route element={<ProtectedRoute />}>
 					<Route path='/about' element={<About />} />
 					<Route path='/profile' element={<UserProfile />} />
+					<Route path='/' element={<DoctorsList />} />
 					<Route path='/calendar' element={<DoctorSchedule />} />
 					<Route path='/doctors' element={<DoctorsList />} />
 					<Route path='/doctors/:id' element={<DoctorDetails />} />
@@ -41,7 +42,7 @@ const AppRouter = () => (
 					{/* Новый маршрут для записи к врачу */}
 
 					{/* <Route
-						path='/doctors/:id'
+						path='/doctors/:id'	
 						element={<PatientAppointmentScheduler />}
 					/> */}
 					{/* <Route path="/doctors" element={<DoctorsList />} /> */}
