@@ -26,7 +26,7 @@ const AppRouter = () => (
 				<Route path='/registerDoctor' element={<RegisterDoctor />} />
 				<Route path='/login' element={<LoginUser />} />
 
-				<Route path='/' element={<HomePages />} />
+				{/* <Route path='/' element={<HomePages />} /> */}
 
 				{/* Защищённые маршруты (видны только после авторизации) */}
 				<Route element={<ProtectedRoute />}>
