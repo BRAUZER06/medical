@@ -34,7 +34,7 @@ const AppRouter = () => (
 					<Route path='/profile' element={<UserProfile />} />
 					<Route path='/' element={<DoctorsList />} />
 					<Route path='/calendar' element={<DoctorSchedule />} />
-					<Route path='/doctors' element={<DoctorsList />} />
+					{/* <Route path='/doctors' element={<DoctorsList />} /> */}
 					<Route path='/doctors/:id' element={<DoctorDetails />} />
 
 					<Route path='/chats' element={<Chats />} />
