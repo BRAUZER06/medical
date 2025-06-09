@@ -22,6 +22,7 @@ import {
 import { logout } from '../../Authentication/authSlice'
 import { useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
+import { AppDispatch } from '../../../store'
 
 import EditIcon from '@mui/icons-material/Edit'
 import SaveIcon from '@mui/icons-material/Save'
@@ -49,7 +50,7 @@ import 'react-photo-view/dist/react-photo-view.css'
 
 export default function UserProfile() {
 	const queryClient = useQueryClient()
-	const dispatch = useDispatch()
+	const dispatch = useDispatch<AppDispatch>()
 	const navigate = useNavigate()
 	const [appointments, setAppointments] = useState([])
 	const [editingAppointmentId, setEditingAppointmentId] = useState(null)
