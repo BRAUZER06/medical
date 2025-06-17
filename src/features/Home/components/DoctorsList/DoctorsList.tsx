@@ -100,7 +100,7 @@ const DoctorsList: React.FC = () => {
 						</div>
 						<ArrowForwardIos
 							className={styles.arrowIcon}
-							onClick={() => navigate('/doctors')} // ✅ замена
+							onClick={() => navigate('/')} // ✅ замена
 						/>
 					</Box>
 				))}
@@ -110,7 +110,7 @@ const DoctorsList: React.FC = () => {
 				variant='contained'
 				color='success'
 				className={styles.showMoreButton}
-				onClick={() => navigate('/doctors')} // ✅ замена
+				onClick={() => navigate('/')} // ✅ замена
 			>
 				Показать еще
 			</Button>

@@ -5,6 +5,7 @@ import { createTheme, ThemeProvider } from '@mui/material/styles'
 import CssBaseline from '@mui/material/CssBaseline'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { getToken } from './utils/jwt'
+import AppInitializer from './pages/AppInitializer'
 
 const theme = createTheme({
 	palette: {
@@ -55,7 +56,9 @@ const App = () => {
 			<ThemeProvider theme={theme}>
 				<CssBaseline />
 				<Provider store={store}>
-					<AppRouter />
+					<AppInitializer>
+						<AppRouter />
+					</AppInitializer>
 				</Provider>
 			</ThemeProvider>
 		</QueryClientProvider>
