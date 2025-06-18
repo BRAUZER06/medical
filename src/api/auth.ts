@@ -1,5 +1,14 @@
-import axiosInstance from './instance'
+import axios from 'axios'
 import { setToken } from '../utils/jwt'
+
+// Отдельный instance для аутентификации (без /api/ префикса)
+const authInstance = axios.create({
+	baseURL: import.meta.env.VITE_API_BASE_URL?.replace('/api', '') || 'https://only-doc.ru',
+	headers: {
+		Accept: 'application/json',
+		'Content-Type': 'application/json',
+	},
+})
 
 interface UserRegistrationData {
 	email: string
@@ -17,7 +26,7 @@ interface LoginCredentials {
 
 export const registerUser = async (user: UserRegistrationData) => {
 	try {
-		const response = await axiosInstance.post('/signup', { user })	
+		const response = await authInstance.post('/signup', { user })	
 		return response
 	} catch (error) {
 		console.error('Ошибка регистрации:', error)
@@ -27,7 +36,7 @@ export const registerUser = async (user: UserRegistrationData) => {
 
 export const loginUser = async (credentials: LoginCredentials) => {
 	try {
-		const response = await axiosInstance.post('/login', {
+		const response = await authInstance.post('/login', {
 			user: { ...credentials },
 		})
 

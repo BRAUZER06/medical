@@ -12,7 +12,7 @@ import { ChatMessages } from './ChatMessages'
 import { FilePreviewList } from './FilePreviewList'
 import { ChatInput } from './ChatInput'
 
-const cable = createConsumer('wss://only-doc.ru/cable')
+const cable = createConsumer(import.meta.env.VITE_WS_URL || 'wss://only-doc.ru/cable')
 
 const subscribeToChat = (chatId: number, onReceived: (data: any) => void) => {
 	return cable.subscriptions.create(

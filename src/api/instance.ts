@@ -1,7 +1,7 @@
 import axios from 'axios'
 import { getToken, removeToken } from '../utils/jwt'
 
-export const API_BASE_URL = 'https://only-doc.ru'
+export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://only-doc.ru/api'
 
 const axiosInstance = axios.create({
 	baseURL: API_BASE_URL,
