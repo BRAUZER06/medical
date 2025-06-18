@@ -27,9 +27,14 @@ axiosInstance.interceptors.response.use(
 	(response) => response,
 	(error) => {
 		if (error.response?.status === 401) {
-			// Если получили 401, удаляем токен и перенаправляем на логин
+			// Если получили 401, удаляем токен
 			removeToken()
-			window.location.href = '/login'
+			
+			// Редиректим на логин только если мы НЕ на странице логина/регистрации
+			const currentPath = window.location.pathname
+			if (currentPath !== '/login' && currentPath !== '/signup') {
+				window.location.href = '/login'
+			}
 		}
 		return Promise.reject(error)
 	}

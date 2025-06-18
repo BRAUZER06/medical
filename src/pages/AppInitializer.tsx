@@ -5,7 +5,6 @@ import { getToken } from '../utils/jwt'
 import { fetchCurrentUser } from '../api/profile'
 import { setUser } from '../features/Authentication/authSlice'
 
-
 const AppInitializer = ({ children }) => {
 	const dispatch = useDispatch()
 	const [loading, setLoading] = useState(true)
@@ -13,7 +12,12 @@ const AppInitializer = ({ children }) => {
 	useEffect(() => {
 		const init = async () => {
 			const token = getToken()
-			if (token) {
+			
+			// Не делаем API запрос на публичных страницах
+			const publicPaths = ['/login', '/signup', '/register', '/registerDoctor']
+			const isPublicPath = publicPaths.includes(window.location.pathname)
+			
+			if (token && !isPublicPath) {
 				try {
 					const user = await fetchCurrentUser()
 					dispatch(setUser({ user, token }))
