@@ -96,20 +96,24 @@ export default function Chat() {
 	const handleSend = async () => {
 		if (!chatId || (!newMessage.trim() && attachedFiles.length === 0)) return
 
+		// Prepare payload
 		const formData = new FormData()
 		formData.append(
 			'message_type',
 			attachedFiles.length > 0 ? selectedMessageType : 'text'
 		)
-
 		attachedFiles.forEach(file => formData.append('attachments[]', file))
-
 		if (newMessage.trim()) formData.append('content', newMessage)
 
-		await createMessage(chatId, formData)
-
+		// Clear input and file list immediately for better UX
 		setNewMessage('')
 		setAttachedFiles([])
+		// Reset hidden file input element
+		const fileInput = document.getElementById('file-input') as HTMLInputElement | null
+		if (fileInput) fileInput.value = ''
+
+		// Send message
+		await createMessage(chatId, formData)
 	}
 
 	const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
