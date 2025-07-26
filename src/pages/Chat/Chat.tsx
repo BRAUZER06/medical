@@ -75,8 +75,11 @@ export default function Chat() {
 
 		subscriptionRef.current = subscribeToChat(chatId, data => {
 			setMessages(prev => [...prev, data])
-			// Показать уведомление при новом сообщении
-			if (Notification.permission === 'granted') {
+			// Показать уведомление только если сообщение от другого пользователя
+			if (
+				Notification.permission === 'granted' &&
+				data.sender?.id !== currentUser?.id
+			) {
 				const senderName = data.sender?.name || 'Собеседник'
 				const body = data.content || 'Прикрепленный файл'
 				const notif = new Notification(`Новое сообщение от ${senderName}`, { body })
@@ -87,7 +90,7 @@ export default function Chat() {
 		return () => {
 			subscriptionRef.current?.unsubscribe()
 		}
-	}, [chatId])
+   }, [chatId, currentUser])
 
 	useEffect(() => {
 		scrollRef.current?.scrollIntoView({ behavior: 'smooth' })
