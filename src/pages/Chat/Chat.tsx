@@ -46,6 +46,13 @@ export default function Chat() {
 
 	const subscriptionRef = useRef<any>(null)
 
+	// Запрос разрешения на уведомления при загрузке
+	useEffect(() => {
+		if ('Notification' in window && Notification.permission !== 'granted') {
+			Notification.requestPermission()
+		}
+	}, [])
+
 	const { data: currentUser, isLoading: isCurrentUserLoading } = useQuery<User>(
 		{
 			queryKey: ['currentUser'],
@@ -68,6 +75,13 @@ export default function Chat() {
 
 		subscriptionRef.current = subscribeToChat(chatId, data => {
 			setMessages(prev => [...prev, data])
+			// Показать уведомление при новом сообщении
+			if (Notification.permission === 'granted') {
+				const senderName = data.sender?.name || 'Собеседник'
+				const body = data.content || 'Прикрепленный файл'
+				const notif = new Notification(`Новое сообщение от ${senderName}`, { body })
+				notif.onclick = () => window.focus()
+			}
 		})
 
 		return () => {
