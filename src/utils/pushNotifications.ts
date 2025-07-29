@@ -55,19 +55,62 @@ interface PushStatus {
   supported: boolean;
   subscribed: boolean;
   permission?: NotificationPermission;
+  reason?: string; // Причина неподдержки
+}
+
+// Проверка поддержки push-уведомлений с учетом Safari/iOS
+function isPushSupported(): { supported: boolean; reason?: string } {
+  // Проверяем базовую поддержку
+  if (!('serviceWorker' in navigator)) {
+    return { supported: false, reason: 'Service Worker не поддерживается' };
+  }
+
+  if (!('PushManager' in window)) {
+    return { supported: false, reason: 'Push Manager не поддерживается' };
+  }
+
+  if (!('Notification' in window)) {
+    return { supported: false, reason: 'Notifications API не поддерживается' };
+  }
+
+  // Специальная проверка для Safari/iOS
+  const userAgent = navigator.userAgent.toLowerCase();
+  const isSafari = /safari/.test(userAgent) && !/chrome/.test(userAgent);
+  const isIOS = /iphone|ipad|ipod/.test(userAgent);
+  
+  if (isSafari || isIOS) {
+    // Safari поддерживает push только в PWA режиме
+    const isStandalone = window.matchMedia('(display-mode: standalone)').matches ||
+                         (window.navigator as any).standalone === true ||
+                         document.referrer.includes('android-app://');
+    
+    if (!isStandalone) {
+      return { 
+        supported: false, 
+        reason: 'Safari поддерживает push-уведомления только для PWA. Добавьте приложение на домашний экран.' 
+      };
+    }
+    
+    // Проверяем версию Safari/iOS
+    const safariVersion = userAgent.match(/version\/(\d+)/)?.[1];
+    if (safariVersion && parseInt(safariVersion) < 16) {
+      return { 
+        supported: false, 
+        reason: 'Требуется Safari 16.4+ для поддержки push-уведомлений' 
+      };
+    }
+  }
+
+  return { supported: true };
 }
 
 // Основная функция подписки
 export async function subscribeToPushNotifications(): Promise<PushSubscriptionResult> {
   // Проверка поддержки
-  if (!('serviceWorker' in navigator)) {
-    console.log('Service Worker не поддерживается');
-    return { success: false, error: 'Service Worker не поддерживается' };
-  }
-
-  if (!('PushManager' in window)) {
-    console.log('Push messaging не поддерживается');
-    return { success: false, error: 'Push messaging не поддерживается' };
+  const supportCheck = isPushSupported();
+  if (!supportCheck.supported) {
+    console.log('Push уведомления не поддерживаются:', supportCheck.reason);
+    return { success: false, error: supportCheck.reason || 'Push уведомления не поддерживаются' };
   }
 
   try {
@@ -151,8 +194,13 @@ export async function unsubscribeFromPushNotifications(): Promise<PushSubscripti
 
 // Проверка статуса подписки
 export async function checkPushSubscriptionStatus(): Promise<PushStatus> {
-  if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
-    return { supported: false, subscribed: false };
+  const supportCheck = isPushSupported();
+  if (!supportCheck.supported) {
+    return { 
+      supported: false, 
+      subscribed: false,
+      reason: supportCheck.reason
+    };
   }
 
   try {
