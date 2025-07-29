@@ -52,7 +52,23 @@ const NotificationSettings: React.FC = () => {
   if (!status.supported) {
     return (
       <div className={styles.notificationSettings}>
-        <p>Ваш браузер не поддерживает push-уведомления</p>
+        <h3>Настройки уведомлений</h3>
+        <div className={styles.unsupportedMessage}>
+          <p>❌ {status.reason || 'Ваш браузер не поддерживает push-уведомления'}</p>
+          
+          {status.reason?.includes('PWA') && (
+            <div className={styles.pwaInstructions}>
+              <h4>Для получения уведомлений:</h4>
+              <ol>
+                <li>Нажмите кнопку <strong>Поделиться</strong> 📤 в Safari</li>
+                <li>Выберите <strong>"На экран Домой"</strong></li>
+                <li>Нажмите <strong>"Добавить"</strong></li>
+                <li>Откройте приложение с домашнего экрана</li>
+                <li>Включите уведомления в настройках</li>
+              </ol>
+            </div>
+          )}
+        </div>
       </div>
     );
   }

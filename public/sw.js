@@ -1,6 +1,6 @@
 // Service Worker для Medical Consultation PWA
 // Версия для кеш-инвалидации
-const CACHE_VERSION = 'v1';
+const CACHE_VERSION = 'v2';
 const STATIC_CACHE = `medical-consultation-static-${CACHE_VERSION}`;
 const DYNAMIC_CACHE = `medical-consultation-dynamic-${CACHE_VERSION}`;
 
@@ -36,18 +36,32 @@ self.addEventListener('install', (event) => {
 self.addEventListener('activate', (event) => {
   console.log('[SW] Activating...');
   event.waitUntil(
-    caches.keys().then(cacheNames => {
-      return Promise.all(
-        cacheNames.map(cacheName => {
-          if (cacheName !== STATIC_CACHE && cacheName !== DYNAMIC_CACHE) {
-            console.log('[SW] Deleting old cache:', cacheName);
-            return caches.delete(cacheName);
-          }
-        })
-      );
-    }).then(() => {
-      console.log('[SW] Activation complete');
-      return self.clients.claim();
+    Promise.all([
+      // Очищаем старые кеши
+      caches.keys().then(cacheNames => {
+        return Promise.all(
+          cacheNames.map(cacheName => {
+            if (cacheName !== STATIC_CACHE && cacheName !== DYNAMIC_CACHE) {
+              console.log('[SW] Deleting old cache:', cacheName);
+              return caches.delete(cacheName);
+            }
+          })
+        );
+      }),
+      // Немедленно берем контроль над всеми клиентами
+      self.clients.claim()
+    ]).then(() => {
+      console.log('[SW] Activation complete, controlling all clients');
+      
+      // Уведомляем всех клиентов о том, что новый SW активен
+      return self.clients.matchAll().then(clients => {
+        clients.forEach(client => {
+          client.postMessage({
+            type: 'SW_UPDATED',
+            message: 'Service Worker обновлен'
+          });
+        });
+      });
     })
   );
 });
@@ -223,6 +237,7 @@ self.addEventListener('message', (event) => {
   console.log('[SW] Message received:', event.data);
   
   if (event.data && event.data.type === 'SKIP_WAITING') {
+    console.log('[SW] Skipping waiting and taking control');
     self.skipWaiting();
   }
 });

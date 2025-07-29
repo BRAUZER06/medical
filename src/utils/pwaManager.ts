@@ -88,13 +88,30 @@ class PWAManager {
       registration.addEventListener('updatefound', () => {
         const newWorker = registration.installing;
         if (newWorker) {
+          console.log('[PWA] New service worker installing...');
           newWorker.addEventListener('statechange', () => {
+            console.log('[PWA] Service worker state changed:', newWorker.state);
             if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+              console.log('[PWA] New service worker installed, showing update banner');
               this.onServiceWorkerUpdate(registration);
             }
           });
         }
       });
+
+      // Слушаем сообщения от Service Worker
+      navigator.serviceWorker.addEventListener('message', (event) => {
+        console.log('[PWA] Message from SW:', event.data);
+        if (event.data.type === 'SW_UPDATED') {
+          console.log('[PWA] Service Worker updated successfully');
+        }
+      });
+
+      // Проверяем, есть ли ожидающий обновления SW
+      if (registration.waiting) {
+        console.log('[PWA] Service worker waiting, showing update banner');
+        this.onServiceWorkerUpdate(registration);
+      }
 
       return registration;
     } catch (error) {
@@ -212,6 +229,12 @@ class PWAManager {
   }
 
   private showUpdateBanner(registration: ServiceWorkerRegistration) {
+    // Удаляем существующий баннер, если есть
+    const existingBanner = document.getElementById('pwa-update-banner');
+    if (existingBanner) {
+      existingBanner.remove();
+    }
+
     const banner = document.createElement('div');
     banner.id = 'pwa-update-banner';
     banner.className = 'pwa-update-banner';
@@ -233,17 +256,41 @@ class PWAManager {
     `;
 
     banner.querySelector('#pwa-update-btn')?.addEventListener('click', () => {
+      console.log('[PWA] User clicked update button');
       if (registration.waiting) {
+        console.log('[PWA] Sending SKIP_WAITING message to service worker');
+        // Отправляем сообщение новому SW для пропуска ожидания
         registration.waiting.postMessage({ type: 'SKIP_WAITING' });
+        
+        // Слушаем событие controllerchange для перезагрузки
+        const handleControllerChange = () => {
+          console.log('[PWA] New service worker activated, reloading...');
+          navigator.serviceWorker.removeEventListener('controllerchange', handleControllerChange);
+          window.location.reload();
+        };
+        
+        navigator.serviceWorker.addEventListener('controllerchange', handleControllerChange);
+        
+        // Если через 3 секунды ничего не произошло, перезагружаем принудительно
+        setTimeout(() => {
+          console.log('[PWA] Force reload after timeout');
+          navigator.serviceWorker.removeEventListener('controllerchange', handleControllerChange);
+          window.location.reload();
+        }, 3000);
+      } else {
+        console.log('[PWA] No waiting service worker, reloading anyway');
         window.location.reload();
       }
+      banner.remove();
     });
 
     banner.querySelector('#pwa-update-dismiss-btn')?.addEventListener('click', () => {
+      console.log('[PWA] User dismissed update banner');
       banner.remove();
     });
 
     document.body.appendChild(banner);
+    console.log('[PWA] Update banner shown');
   }
 
   // Публичные методы
