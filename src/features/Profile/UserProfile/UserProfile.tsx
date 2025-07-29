@@ -12,6 +12,7 @@ import {
 } from '@mui/material'
 import styles from './UserProfile.module.scss'
 import PatientHistory from '../../../components/PatientHistory/PatientHistory'
+import NotificationSettings from '../../../components/NotificationSettings/NotificationSettings'
 import {
 	fetchCurrentUser,
 	SpecializationKey,
@@ -491,6 +492,15 @@ export default function UserProfile() {
 						</Box>
 					)}
 				</Paper>
+				
+				{/* Настройки уведомлений */}
+				<Paper sx={{ boxShadow: 'none', marginBottom: 3, padding: 2 }}>
+					<Typography variant='h6' gutterBottom>
+						Уведомления
+					</Typography>
+					<NotificationSettings />
+				</Paper>
+				
 				{/* Поля для пациента */}
 				{/* Блок записей к врачу */}
 				<Paper sx={{ boxShadow: 'none', marginBottom: 3 }}>
