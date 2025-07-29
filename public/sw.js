@@ -111,7 +111,7 @@ self.addEventListener('fetch', (event) => {
 
 // Обработка Push-уведомлений
 self.addEventListener('push', (event) => {
-  console.log('[SW] Push received:', event.data?.text());
+  console.log('[SW] Push received');
   
   if (!event.data) {
     console.warn('[SW] Push event has no data');
@@ -120,6 +120,8 @@ self.addEventListener('push', (event) => {
 
   try {
     const data = event.data.json();
+    
+    // Базовые настройки для всех уведомлений
     const options = {
       body: data.body || 'У вас новое уведомление',
       icon: '/icon-192x192.png',
@@ -130,7 +132,26 @@ self.addEventListener('push', (event) => {
         timestamp: Date.now(),
         url: data.url || '/'
       },
-      actions: [
+      requireInteraction: false,
+      silent: false,
+      timestamp: Date.now()
+    };
+
+    // Проверяем, работаем ли мы на iOS
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+    
+    if (isIOS) {
+      // Для iOS упрощаем опции уведомления
+      options.actions = undefined; // iOS не поддерживает actions в уведомлениях
+      options.vibrate = undefined; // Вибрация может не работать
+      
+      // Устанавливаем requireInteraction в true для iOS
+      options.requireInteraction = true;
+      
+      console.log('[SW] iOS detected, using simplified notification options');
+    } else {
+      // Для других платформ добавляем действия и вибрацию
+      options.actions = [
         {
           action: 'open',
           title: 'Открыть',
@@ -140,12 +161,9 @@ self.addEventListener('push', (event) => {
           action: 'close', 
           title: 'Закрыть'
         }
-      ],
-      requireInteraction: false,
-      silent: false,
-      vibrate: [200, 100, 200],
-      timestamp: Date.now()
-    };
+      ];
+      options.vibrate = [200, 100, 200];
+    }
 
     // Специальная обработка для чатов
     if (data.type === 'chat_message') {

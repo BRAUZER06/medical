@@ -71,6 +71,10 @@ class PWAManager {
     return /iPad|iPhone|iPod/.test(navigator.userAgent);
   }
 
+  private isMobileDevice(): boolean {
+    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+  }
+
   private async registerServiceWorker(): Promise<ServiceWorkerRegistration | null> {
     if (!('serviceWorker' in navigator)) {
       console.warn('[PWA] Service Worker not supported');
@@ -134,8 +138,17 @@ class PWAManager {
 
   private onServiceWorkerUpdate(registration: ServiceWorkerRegistration) {
     console.log('[PWA] Service Worker update available');
-    // Можно показать уведомление об обновлении
-    this.showUpdateBanner(registration);
+    
+    // Для iOS показываем обновления только в PWA режиме
+    if (this.isIOSDevice() && !this.isStandalone) {
+      console.log('[PWA] iOS detected but not in standalone mode, skipping update banner');
+      return;
+    }
+    
+    // Показываем баннер только на мобильных устройствах в PWA режиме
+    if (this.isStandalone) {
+      this.showUpdateBanner(registration);
+    }
   }
 
   public async showInstallPrompt(): Promise<boolean> {

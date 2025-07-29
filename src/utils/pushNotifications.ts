@@ -4,7 +4,34 @@
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://only-doc.ru/api';
 const PUSH_SERVICE_URL = import.meta.env.VITE_PUSH_SERVICE_URL || 'https://only-doc.ru:8080';
 
-// Конвертация VAPID ключа
+// Простая функция для проверки статуса push уведомлений  
+export async function checkPushStatus(): Promise<any> {
+  const status = {
+    supported: isPushSupported().supported,
+    permission: 'Notification' in window ? Notification.permission : 'not supported',
+    isIOS: /iPad|iPhone|iPod/.test(navigator.userAgent),
+    isStandalone: (window.navigator as any).standalone === true || 
+      window.matchMedia('(display-mode: standalone)').matches,
+    hasServiceWorker: 'serviceWorker' in navigator,
+    hasSubscription: false,
+    endpoint: null
+  };
+
+  if ('serviceWorker' in navigator) {
+    try {
+      const registration = await navigator.serviceWorker.getRegistration();
+      if (registration?.pushManager) {
+        const subscription = await registration.pushManager.getSubscription();
+        status.hasSubscription = !!subscription;
+        status.endpoint = subscription?.endpoint || null;
+      }
+    } catch (error) {
+      console.error('Error checking push status:', error);
+    }
+  }
+
+  return status;
+}
 function urlBase64ToUint8Array(base64String: string): Uint8Array {
   const padding = '='.repeat((4 - base64String.length % 4) % 4);
   const base64 = (base64String + padding)
@@ -111,6 +138,19 @@ export async function subscribeToPushNotifications(): Promise<PushSubscriptionRe
   if (!supportCheck.supported) {
     console.log('Push уведомления не поддерживаются:', supportCheck.reason);
     return { success: false, error: supportCheck.reason || 'Push уведомления не поддерживаются' };
+  }
+
+  // Специальная проверка для iOS
+  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+  const isStandalone = (window.navigator as any).standalone === true || 
+    window.matchMedia('(display-mode: standalone)').matches;
+  
+  if (isIOS && !isStandalone) {
+    console.log('iOS: приложение должно быть добавлено на домашний экран для push уведомлений');
+    return { 
+      success: false, 
+      error: 'На iOS приложение должно быть добавлено на домашний экран для получения push-уведомлений' 
+    };
   }
 
   try {
