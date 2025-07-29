@@ -1,5 +1,9 @@
 // src/utils/pushNotifications.ts
 
+// Конфигурация URL-ов
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://only-doc.ru/api';
+const PUSH_SERVICE_URL = import.meta.env.VITE_PUSH_SERVICE_URL || 'https://only-doc.ru:8080';
+
 // Конвертация VAPID ключа
 function urlBase64ToUint8Array(base64String: string): Uint8Array {
   const padding = '='.repeat((4 - base64String.length % 4) % 4);
@@ -29,7 +33,17 @@ function arrayBufferToBase64(buffer: ArrayBuffer): string {
 
 // Получение токена авторизации
 function getAuthToken(): string | null {
-  return localStorage.getItem('authToken'); // Замените на ваш способ хранения токена
+  return localStorage.getItem('jwt_token'); // Используем тот же ключ что и в jwt.ts
+}
+
+// Получение базового URL для API
+function getApiBaseUrl(): string {
+  return API_BASE_URL;
+}
+
+// Получение URL для Push сервиса
+function getPushServiceUrl(): string {
+  return PUSH_SERVICE_URL;
 }
 
 interface PushSubscriptionResult {
@@ -68,7 +82,7 @@ export async function subscribeToPushNotifications(): Promise<PushSubscriptionRe
     }
 
     // Получение VAPID ключа с Go сервиса
-    const vapidResponse = await fetch('http://localhost:8080/api/vapid-public-key');
+    const vapidResponse = await fetch(`${getPushServiceUrl()}/api/vapid-public-key`);
     if (!vapidResponse.ok) {
       throw new Error('Не удалось получить VAPID ключ');
     }
@@ -81,7 +95,7 @@ export async function subscribeToPushNotifications(): Promise<PushSubscriptionRe
     });
 
     // Отправка подписки на Rails сервер
-    const subscribeResponse = await fetch('/api/push-subscription', {
+    const subscribeResponse = await fetch(`${getApiBaseUrl()}/push-subscription`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -121,7 +135,7 @@ export async function unsubscribeFromPushNotifications(): Promise<PushSubscripti
     }
 
     // Удаление подписки с сервера
-    const response = await fetch('/api/push-subscription', {
+    const response = await fetch(`${getApiBaseUrl()}/push-subscription`, {
       method: 'DELETE',
       headers: {
         'Authorization': `Bearer ${getAuthToken()}`
