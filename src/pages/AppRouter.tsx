@@ -15,6 +15,7 @@ import Chats from './Chats/Chats'
 import Chat from './Chat/Chat'
 import RegisterDoctor from '../features/Authentication/RegisterDoctor/RegisterDoctor'
 import PushNotificationManager from '../components/PushNotificationManager/PushNotificationManager'
+import PWAInstallPrompt from '../components/PWAInstallPrompt/PWAInstallPrompt'
 
 
 
@@ -22,6 +23,7 @@ const AppRouter = () => (
 	<Router>
 		<div style={{ maxWidth: 600, padding: '0px 8px', margin: '0 auto 65px' }}>
 			<PushNotificationManager />
+			<PWAInstallPrompt />
 			<Routes>
 				{/* Открытые маршруты */}
 				<Route path='/register' element={<RegisterUser />} />
