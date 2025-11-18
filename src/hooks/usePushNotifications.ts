@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { initializePushNotifications } from '../utils/pushNotifications';
+import { initializePushNotifications, getCurrentSubscription } from '../utils/pushNotifications';
 import { getVapidPublicKey, registerPushSubscription } from '../api/pushSubscriptions';
 
 export const usePushNotifications = () => {
@@ -8,16 +8,32 @@ export const usePushNotifications = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    // Проверяем поддержку при монтировании
-    const checkSupport = () => {
+    // Проверяем поддержку и существующую подписку при монтировании
+    const checkSupportAndSubscription = async () => {
       const supported = 
         'serviceWorker' in navigator &&
         'PushManager' in window &&
         'Notification' in window;
       setIsSupported(supported);
+
+      // Проверяем, есть ли уже активная подписка
+      if (supported) {
+        const existingSubscription = await getCurrentSubscription();
+        setIsSubscribed(!!existingSubscription);
+        
+        // Если есть подписка, синхронизируем её с сервером
+        if (existingSubscription) {
+          try {
+            await registerPushSubscription(existingSubscription);
+            console.log('Подписка синхронизирована с сервером');
+          } catch (error) {
+            console.error('Ошибка синхронизации подписки:', error);
+          }
+        }
+      }
     };
 
-    checkSupport();
+    checkSupportAndSubscription();
   }, []);
 
   const enablePushNotifications = async () => {
