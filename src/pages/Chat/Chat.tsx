@@ -14,6 +14,31 @@ import { ChatInput } from './ChatInput'
 
 const cable = createConsumer(import.meta.env.VITE_WS_URL || 'wss://only-doc.ru/cable')
 
+// Функция для показа локального уведомления о новом сообщении
+const showChatNotification = (message: any, chatPartner: any) => {
+	if (!('Notification' in window)) return
+	if (Notification.permission !== 'granted') return
+	
+	// Не показываем уведомление, если пользователь находится на странице чата
+	if (document.hasFocus()) return
+	
+	const senderName = message.sender?.name || chatPartner?.name || 'Неизвестный'
+	const content = message.content || 'Отправил файл'
+	
+	const notification = new Notification(`Новое сообщение от ${senderName}`, {
+		body: content.length > 100 ? content.substring(0, 100) + '...' : content,
+		icon: '/icons/icon-192x192.png',
+		badge: '/icons/icon-72x72.png',
+		tag: `chat-${message.chat_id}`,
+		requireInteraction: false
+	})
+	
+	notification.onclick = () => {
+		window.focus()
+		notification.close()
+	}
+}
+
 const subscribeToChat = (chatId: number, onReceived: (data: any) => void) => {
 	return cable.subscriptions.create(
 		{ channel: 'ChatChannel', chat_id: chatId },
@@ -68,12 +93,17 @@ export default function Chat() {
 
 		subscriptionRef.current = subscribeToChat(chatId, data => {
 			setMessages(prev => [...prev, data])
+			
+			// Показываем уведомление только если сообщение от другого пользователя
+			if (currentUser && data.sender?.id !== currentUser.id) {
+				showChatNotification(data, chatPartner)
+			}
 		})
 
 		return () => {
 			subscriptionRef.current?.unsubscribe()
 		}
-	}, [chatId])
+	}, [chatId, currentUser, chatPartner])
 
 	useEffect(() => {
 		scrollRef.current?.scrollIntoView({ behavior: 'smooth' })
