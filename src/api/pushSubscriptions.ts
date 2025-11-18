@@ -1,4 +1,4 @@
-import axiosClient from './axiosClient';
+import axiosInstance from './instance';
 
 export interface PushSubscriptionData {
   endpoint: string;
@@ -20,21 +20,21 @@ export const registerPushSubscription = async (
     }
   };
 
-  await axiosClient.post('/push-subscriptions', subscriptionData);
+  await axiosInstance.post('/push-subscriptions', subscriptionData);
 };
 
 // Удаление push-подписки с сервера
 export const unregisterPushSubscription = async (
   endpoint: string
 ): Promise<void> => {
-  await axiosClient.delete('/push-subscriptions', {
+  await axiosInstance.delete('/push-subscriptions', {
     data: { endpoint }
   });
 };
 
 // Получение VAPID публичного ключа
 export const getVapidPublicKey = async (): Promise<string> => {
-  const response = await axiosClient.get<{ publicKey: string }>('/push-subscriptions/vapid-key');
+  const response = await axiosInstance.get<{ publicKey: string }>('/push-subscriptions/vapid-key');
   return response.data.publicKey;
 };
 
