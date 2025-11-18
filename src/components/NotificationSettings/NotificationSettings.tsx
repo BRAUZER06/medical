@@ -1,8 +1,7 @@
-import React from 'react';
 import { usePushNotifications } from '../../hooks/usePushNotifications';
 import styles from './NotificationSettings.module.scss';
 
-export const NotificationSettings: React.FC = () => {
+export const NotificationSettings = () => {
   const { isSupported, isSubscribed, isLoading, enablePushNotifications } = usePushNotifications();
 
   const handleEnableNotifications = async () => {
