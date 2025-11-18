@@ -46,6 +46,7 @@ import { createOrFetchChat } from '../../../api/chats'
 import { SpecializationsSelect } from '../../../components/SpecializationsSelect/SpecializationsSelect'
 import { PhotoProvider, PhotoView } from 'react-photo-view'
 import 'react-photo-view/dist/react-photo-view.css'
+import { NotificationSettings } from '../../../components/NotificationSettings/NotificationSettings'
 
 export default function UserProfile() {
 	const queryClient = useQueryClient()
@@ -1050,6 +1051,10 @@ export default function UserProfile() {
 						)}
 					</Paper>
 				)}{' '}
+				
+				{/* Настройки Push-уведомлений */}
+				<NotificationSettings />
+				
 				<Button
 					variant='outlined'
 					color='error'

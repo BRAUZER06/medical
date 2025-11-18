@@ -1,0 +1,87 @@
+.notificationSettings {
+  padding: 20px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  margin: 20px 0;
+
+  h3 {
+    margin: 0 0 12px 0;
+    font-size: 20px;
+    color: #333;
+  }
+
+  .description {
+    color: #666;
+    margin-bottom: 20px;
+    font-size: 14px;
+  }
+
+  .warning {
+    color: #f44336;
+    padding: 12px;
+    background: #ffebee;
+    border-radius: 8px;
+    margin: 0;
+  }
+
+  .settingsGroup {
+    margin: 20px 0;
+  }
+
+  .setting {
+    padding: 16px 0;
+    border-bottom: 1px solid #eee;
+
+    &:last-child {
+      border-bottom: none;
+    }
+
+    .settingInfo {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+
+      strong {
+        font-size: 16px;
+        color: #333;
+      }
+
+      span {
+        font-size: 13px;
+        color: #999;
+      }
+    }
+  }
+
+  .enableButton {
+    width: 100%;
+    padding: 14px;
+    background: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.3s;
+
+    &:hover {
+      background: #45a049;
+    }
+
+    &:disabled {
+      background: #cccccc;
+      cursor: not-allowed;
+    }
+  }
+
+  .successMessage {
+    padding: 14px;
+    background: #e8f5e9;
+    color: #2e7d32;
+    border-radius: 8px;
+    text-align: center;
+    font-weight: 600;
+  }
+}
