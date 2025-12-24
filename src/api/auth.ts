@@ -3,7 +3,7 @@ import { setToken } from '../utils/jwt'
 
 // Отдельный instance для аутентификации (без /api/ префикса)
 const authInstance = axios.create({
-	baseURL: import.meta.env.VITE_API_BASE_URL?.replace('/api', '') || 'https://only-doc.ru',
+	baseURL: import.meta.env.VITE_API_BASE_URL || 'https://only-doc.ru',
 	headers: {
 		Accept: 'application/json',
 		'Content-Type': 'application/json',
