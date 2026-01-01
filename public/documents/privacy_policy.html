@@ -89,6 +89,35 @@
         .definition strong {
             color: #1976d2;
         }
+
+        .back-bar {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .back-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 12px;
+            background: #f3f4f6;
+            color: #111827;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .back-button:hover {
+            background: #e5e7eb;
+        }
+
+        .back-button:active {
+            background: #d1d5db;
+        }
         
         @media (max-width: 768px) {
             .container {
@@ -107,6 +136,9 @@
 </head>
 <body>
     <div class="container">
+        <div class="back-bar">
+            <button class="back-button" onclick="history.back()">← Назад</button>
+        </div>
         <h1>Политика конфиденциальности</h1>
         <p class="last-updated">Последнее обновление: 1 января 2026 г.</p>
         

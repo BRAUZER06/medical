@@ -71,8 +71,12 @@ const CompanyDocuments = () => {
 							textTransform: 'none',
 							borderRadius: 2,
 							py: 1.5,
+							color: '#111827',
+							borderColor: '#e5e7eb',
+							'& .MuiSvgIcon-root': { color: '#4b5563' },
 							'&:hover': {
-								backgroundColor: 'rgba(25, 118, 210, 0.04)',
+								backgroundColor: 'rgba(17, 24, 39, 0.04)',
+								borderColor: '#d1d5db',
 							},
 						}}
 					>
