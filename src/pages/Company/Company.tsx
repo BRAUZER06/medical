@@ -50,13 +50,6 @@ const Company = () => {
 					boxShadow: '0px 6px 18px rgba(0,0,0,0.04)',
 				}}
 			>
-				<Typography variant='h6' gutterBottom>
-					Контакты
-				</Typography>
-				<Typography variant='body2' color='text.secondary' paragraph>
-					Если остались вопросы, свяжитесь с нашей поддержкой через чат после
-					регистрации или по контактам, указанным в документах.
-				</Typography>
 			</Paper>
 		</Box>
 	)
