@@ -33,6 +33,10 @@ const CompanyDocuments = () => {
 			title: 'Регламент оказания консультаций на интернет-платформе',
 			url: '/documents/consultation_regulations.html',
 		},
+		{
+			title: 'Реквизиты',
+			url: '/documents/recvizity.html',
+		},
 	]
 
 	const handleOpenDocument = (url: string) => {
