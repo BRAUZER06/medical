@@ -14,6 +14,7 @@ import DoctorSchedule from '../components/WorkSchedulePicker/DoctorSchedule'
 import Chats from './Chats/Chats'
 import Chat from './Chat/Chat'
 import RegisterDoctor from '../features/Authentication/RegisterDoctor/RegisterDoctor'
+import Company from './Company/Company'
 
 
 
@@ -25,6 +26,7 @@ const AppRouter = () => (
 				<Route path='/register' element={<RegisterUser />} />
 				<Route path='/registerDoctor' element={<RegisterDoctor />} />
 				<Route path='/login' element={<LoginUser />} />
+				<Route path='/company' element={<Company />} />
 
 				{/* <Route path='/' element={<HomePages />} /> */}
 
