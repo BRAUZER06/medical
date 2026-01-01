@@ -34,7 +34,12 @@ const BottomNav = () => {
 
 	const navItems: NavItem[] = [
 		// { path: '/', label: 'Главная', icon: <HomeIcon /> },
-		{ path: '/', label: 'Врачи', icon: <MedicalServicesIcon /> },
+		{
+			path: '/',
+			label: 'Врачи',
+			icon: <MedicalServicesIcon />,
+			allowedRoles: ['patient'],
+		},
 		{ path: '/chats', label: 'Чаты', icon: <ChatIcon /> },
 		{
 			path: '/calendar',
