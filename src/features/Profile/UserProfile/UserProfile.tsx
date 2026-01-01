@@ -37,6 +37,8 @@ import WcIcon from '@mui/icons-material/Wc'
 import InfoIcon from '@mui/icons-material/Info'
 import MedicalInformationIcon from '@mui/icons-material/MedicalInformation'
 import WorkIcon from '@mui/icons-material/Work'
+import DescriptionIcon from '@mui/icons-material/Description'
+import OpenInNewIcon from '@mui/icons-material/OpenInNew'
 import {
 	deletedPatientRecord,
 	getPatientRecord,
@@ -47,6 +49,7 @@ import { SpecializationsSelect } from '../../../components/SpecializationsSelect
 import { PhotoProvider, PhotoView } from 'react-photo-view'
 import 'react-photo-view/dist/react-photo-view.css'
 import { NotificationSettings } from '../../../components/NotificationSettings/NotificationSettings'
+import CompanyDocuments from '../../../components/CompanyDocuments/CompanyDocuments'
 
 export default function UserProfile() {
 	const queryClient = useQueryClient()
@@ -1054,6 +1057,9 @@ export default function UserProfile() {
 				
 				{/* Настройки Push-уведомлений */}
 				<NotificationSettings />
+				
+				{/* Документы о компании */}
+				<CompanyDocuments />
 				
 				<Button
 					variant='outlined'

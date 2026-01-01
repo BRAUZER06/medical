@@ -30,22 +30,6 @@ export const NotificationSettings = () => {
       <p className={styles.description}>
         Получайте уведомления о новых сообщениях и напоминания о приемах врачей
       </p>
-      
-      <div className={styles.settingsGroup}>
-        <div className={styles.setting}>
-          <div className={styles.settingInfo}>
-            <strong>Уведомления о сообщениях</strong>
-            <span>Получайте уведомления при новых сообщениях в чате</span>
-          </div>
-        </div>
-        
-        <div className={styles.setting}>
-          <div className={styles.settingInfo}>
-            <strong>Напоминания о приемах</strong>
-            <span>Получайте напоминания за 10 минут до приема врача</span>
-          </div>
-        </div>
-      </div>
 
       {!isSubscribed && (
         <button 
