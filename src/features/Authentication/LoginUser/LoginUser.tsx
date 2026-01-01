@@ -166,6 +166,19 @@ const handleLoginClick = (e: React.FormEvent<HTMLFormElement>) => {
 									&nbsp;Зарегистрироваться
 								</strong>
 							</Button>
+
+							<Button
+								variant='text'
+								onClick={() => navigate('/company')}
+								fullWidth
+								sx={{
+									textTransform: 'none',
+									fontSize: 14,
+									color: 'text.secondary',
+								}}
+							>
+								О компании
+							</Button>
 						</Box>
 					</form>
 				</Paper>

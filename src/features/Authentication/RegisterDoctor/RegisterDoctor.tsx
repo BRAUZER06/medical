@@ -373,6 +373,19 @@ export default function RegisterDoctor() {
 								Уже есть аккаунт?{' '}
 								<strong style={{ color: '#4c4cff' }}>&nbsp;Войти</strong>
 							</Button>
+
+							<Button
+								variant='text'
+								fullWidth
+								onClick={() => navigate('/company')}
+								sx={{
+									textTransform: 'none',
+									fontSize: 14,
+									color: 'text.secondary',
+								}}
+							>
+								О компании
+							</Button>
 						</Box>
 					</form>
 				</Paper>
