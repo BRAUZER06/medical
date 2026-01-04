@@ -40,35 +40,6 @@ const DoctorsList: React.FC = () => {
 
 	return (
 		<Box sx={{ p:1, pt:2, pb:2, maxWidth: 800, mx: 'auto' }}>
-			{/* Заголовок страницы */}
-			<Paper
-				elevation={3}
-				sx={{
-					mb: 2,
-					py: 2.5,
-					px: 3,
-					borderRadius: 3,
-					background: 'linear-gradient(135deg, #5dd7e8 0%, #4dc0e8 100%)',
-					textAlign: 'center',
-				}}
-			>
-				<Typography
-					variant="h5"
-					fontWeight={700}
-					color="#fff"
-					sx={{ letterSpacing: 0.5 }}
-				>
-					👨‍⚕️ Наши специалисты
-				</Typography>
-				<Typography
-					variant="body2"
-					color="rgba(255,255,255,0.85)"
-					sx={{ mt: 0.5 }}
-				>
-					Выберите подходящего врача и запишитесь на приём
-				</Typography>
-			</Paper>
-
 			{/* Список врачей */}
 			<Box
 				component={motion.div}
