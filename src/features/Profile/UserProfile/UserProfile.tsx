@@ -376,48 +376,49 @@ export default function UserProfile() {
 					</Button>
 				</Box>
 
-				{/* Кошелёк и стоимость консультации */}
-				<Paper
-					elevation={2}
-					sx={{
-						p: 2,
-						mb: 3,
-						borderRadius: 2,
-						backgroundColor: '#f9fafb',
-						border: '1px solid #e5e7eb',
-					}}
-				>
-					<Box
+				{user.role === 'patient' && (
+					<Paper
+						elevation={2}
 						sx={{
-							display: 'flex',
-							flexDirection: { xs: 'column', sm: 'row' },
-							justifyContent: 'space-between',
-							alignItems: { xs: 'flex-start', sm: 'center' },
-							gap: 1.5,
+							p: 2,
+							mb: 3,
+							borderRadius: 2,
+							backgroundColor: '#f9fafb',
+							border: '1px solid #e5e7eb',
 						}}
 					>
-						<Box>
-							<Typography variant='h6'>Кошелёк</Typography>
-							<Typography variant='body2' color='text.secondary'>
-								Консультация врача — 1000 ₽
-							</Typography>
-						</Box>
+						<Box
+							sx={{
+								display: 'flex',
+								flexDirection: { xs: 'column', sm: 'row' },
+								justifyContent: 'space-between',
+								alignItems: { xs: 'flex-start', sm: 'center' },
+								gap: 1.5,
+							}}
+						>
+							<Box>
+								<Typography variant='h6'>Кошелёк</Typography>
+								<Typography variant='body2' color='text.secondary'>
+									Консультация врача — 1000 ₽
+								</Typography>
+							</Box>
 
-						<Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-							<Typography variant='h5' fontWeight={700}>
-								0 ₽
-							</Typography>
-							<Button
-								variant='contained'
-								size='small'
-								startIcon={<AddIcon />}
-								sx={{ textTransform: 'none', borderRadius: 2 }}
-							>
-								Пополнить
-							</Button>
+							<Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+								<Typography variant='h5' fontWeight={700}>
+									0 ₽
+								</Typography>
+								<Button
+									variant='contained'
+									size='small'
+									startIcon={<AddIcon />}
+									sx={{ textTransform: 'none', borderRadius: 2 }}
+								>
+									Пополнить
+								</Button>
+							</Box>
 						</Box>
-					</Box>
-				</Paper>
+					</Paper>
+				)}
 				{/* Основная информация */}
 				<Paper sx={{ padding: 2, marginBottom: 3 }}>
 					<Typography variant='h6' gutterBottom>
