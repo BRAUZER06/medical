@@ -396,7 +396,7 @@ export default function UserProfile() {
 							<Box>
 								<Typography variant='h6'>Кошелёк</Typography>
 								<Typography variant='body2' color='text.secondary'>
-									Консультация врача — 1000 ₽
+									Информационная консультация — 1000 ₽
 								</Typography>
 							</Box>
 
