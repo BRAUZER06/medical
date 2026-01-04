@@ -95,21 +95,23 @@ const DoctorCard: React.FC<DoctorCardProps> = ({ doctor }) => {
 						alignItems='center'
 						mb={0.5}
 					>
-						<Typography
-							variant='subtitle2'
-							fontWeight={600}
-							noWrap
-							sx={{ maxWidth: '170px', color: '#222' }}
-						>
-							{fullName}
-						</Typography>
-						<Typography
-							variant='caption'
-							color='text.secondary'
-							sx={{ ml: 1, whiteSpace: 'nowrap' }}
-						>
-							Информационная консультация — 1000 ₽
-						</Typography>
+						<Box sx={{ minWidth: 0 }}>
+							<Typography
+								variant='subtitle2'
+								fontWeight={600}
+								noWrap
+								sx={{ maxWidth: '200px', color: '#222' }}
+							>
+								{fullName}
+							</Typography>
+							<Typography
+								variant='caption'
+								color='text.secondary'
+								sx={{ display: 'block', mt: 0.25 }}
+							>
+								Информационная консультация — 1000 ₽
+							</Typography>
+						</Box>
 						<Tooltip title='Записаться'>
 							<IconButton
 								size='small'
