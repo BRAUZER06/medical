@@ -103,6 +103,13 @@ const DoctorCard: React.FC<DoctorCardProps> = ({ doctor }) => {
 						>
 							{fullName}
 						</Typography>
+						<Typography
+							variant='caption'
+							color='text.secondary'
+							sx={{ ml: 1, whiteSpace: 'nowrap' }}
+						>
+							Информационная консультация — 1000 ₽
+						</Typography>
 						<Tooltip title='Записаться'>
 							<IconButton
 								size='small'
