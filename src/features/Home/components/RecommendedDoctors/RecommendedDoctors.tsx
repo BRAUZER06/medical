@@ -51,7 +51,7 @@ export default function RecommendedDoctors() {
 	return (
 		<Box sx={{ mt: 4, px: 2 }}>
 			<Typography variant='h6' sx={{ mb: 2, fontWeight: 600 }}>
-				Рекомендуемые врачи
+				Рекомендуемые Специалисты
 			</Typography>
 			{recommended.map(doctor => (
 				<Card

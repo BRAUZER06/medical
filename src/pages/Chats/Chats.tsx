@@ -46,7 +46,7 @@ export default function Chats() {
 			}}
 		>
 			<Typography variant='h5' gutterBottom>
-				Чаты с врачами
+				Чаты
 			</Typography>
 
 			{isLoading ? (
@@ -67,7 +67,7 @@ export default function Chats() {
 						style={{ marginBottom: 16 }}
 					/>
 					<Typography variant='body1' color='text.secondary'>
-						Чаты с врачами отсутствуют
+						Чаты отсутствуют
 					</Typography>
 				</Box>
 			) : (

@@ -36,7 +36,7 @@ const BottomNav = () => {
 		// { path: '/', label: 'Главная', icon: <HomeIcon /> },
 		{
 			path: '/',
-			label: 'Врачи',
+			label: 'Специалисты',
 			icon: <MedicalServicesIcon />,
 			allowedRoles: ['patient'],
 		},

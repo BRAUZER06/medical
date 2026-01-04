@@ -270,7 +270,7 @@ const DoctorDetails: React.FC = () => {
 							color='#fff'
 							sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
 						>
-							🩺 Информация о враче
+							Личная информация
 						</Typography>
 					</AccordionSummary>
 

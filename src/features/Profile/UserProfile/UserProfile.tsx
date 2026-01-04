@@ -357,9 +357,6 @@ export default function UserProfile() {
 							<Typography variant='h5'>
 								{user.first_name} {user.last_name}
 							</Typography>
-							<Typography variant='subtitle1' color='textSecondary'>
-								Роль: {user.role === 'doctor' ? 'Доктор' : 'Пациент'}
-							</Typography>
 						</Box>
 					</Box>
 				</PhotoProvider>
@@ -544,8 +541,8 @@ export default function UserProfile() {
 				<Paper sx={{ boxShadow: 'none', marginBottom: 3 }}>
 					<Typography variant='h6' gutterBottom>
 						{user.role === 'patient'
-							? 'Мои записи к врачу'
-							: 'Записи пациентов'}
+							? 'Запланированные консультации'
+							: 'Запланированные консультации'}
 						:
 					</Typography>
 
@@ -745,7 +742,7 @@ export default function UserProfile() {
 						}}
 					>
 						<Typography variant='h6' gutterBottom>
-							🩺 Информация о пациенте:
+							 Личная информация:
 						</Typography>
 
 						{isEditing ? (
@@ -834,7 +831,7 @@ export default function UserProfile() {
 						}}
 					>
 						<Typography variant='h6' gutterBottom>
-							Информация о докторе
+							Личная информация
 						</Typography>
 
 						{isEditing ? (
